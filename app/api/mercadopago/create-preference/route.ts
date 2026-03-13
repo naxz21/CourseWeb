@@ -7,6 +7,8 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { title, price, courseId, userEmail, userId } = body
 
+    const appUrl = process.env.APP_URL || 'http://localhost:3000'
+
     if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
       return NextResponse.json(
         { error: 'Falta MERCADOPAGO_ACCESS_TOKEN en .env.local' },
@@ -33,14 +35,15 @@ export async function POST(req: Request) {
             }
           : undefined,
         external_reference: JSON.stringify({
-          courseId,
           userId,
+          courseId,
         }),
         back_urls: {
-          success: 'http://localhost:3000/payment/success',
-          failure: 'http://localhost:3000/payment/failure',
-          pending: 'http://localhost:3000/payment/pending',
+          success: `${appUrl}/payment/success`,
+          failure: `${appUrl}/payment/failure`,
+          pending: `${appUrl}/payment/pending`,
         },
+        notification_url: `${appUrl}/api/mercadopago/webhook`,
       },
     })
 
@@ -51,7 +54,7 @@ export async function POST(req: Request) {
       (result as any)?.body?.sandbox_init_point
 
     if (!initPoint) {
-      console.log('MP result completo:', result)
+      console.log('Mercado Pago result:', result)
       return NextResponse.json(
         { error: 'Mercado Pago no devolvió init_point', result },
         { status: 500 }

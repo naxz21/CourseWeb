@@ -22,32 +22,30 @@ export async function POST(req: Request) {
     const payment = await paymentClient.get({ id: paymentId })
     const paymentData: any = payment
 
-    console.log('Pago consultado en Mercado Pago:', paymentData)
+    console.log('Payment data:', paymentData)
 
     const status = paymentData.status || 'pending'
     const payerEmail = paymentData.payer?.email || null
     const mpPaymentId = String(paymentData.id)
     const amount = Number(paymentData.transaction_amount || 0)
-    const mpPreferenceId = paymentData.order?.id || null
     const externalReference = paymentData.external_reference || null
 
-    let courseId: string | null = null
     let userId: string | null = null
+    let courseId: string | null = null
 
     if (externalReference) {
       try {
         const parsed = JSON.parse(externalReference)
-        courseId = parsed.courseId || null
         userId = parsed.userId || null
-      } catch (e) {
-        console.error('No se pudo parsear external_reference:', e)
+        courseId = parsed.courseId || null
+      } catch (err) {
+        console.error('external_reference inválido:', err)
       }
     }
 
-    const paymentResult = await supabaseAdmin.from('payments').upsert(
+    const paymentUpsert = await supabaseAdmin.from('payments').upsert(
       {
         mercadopago_payment_id: mpPaymentId,
-        mercadopago_preference_id: mpPreferenceId,
         payer_email: payerEmail,
         user_id: userId,
         course_id: courseId,
@@ -61,10 +59,10 @@ export async function POST(req: Request) {
       }
     )
 
-    console.log('payments upsert:', paymentResult)
+    console.log('paymentUpsert:', paymentUpsert)
 
     if (status === 'approved' && userId && courseId) {
-      const enrollmentResult = await supabaseAdmin.from('enrollments').upsert(
+      const enrollmentUpsert = await supabaseAdmin.from('enrollments').upsert(
         {
           user_id: userId,
           course_id: courseId,
@@ -75,7 +73,7 @@ export async function POST(req: Request) {
         }
       )
 
-      console.log('enrollment upsert:', enrollmentResult)
+      console.log('enrollmentUpsert:', enrollmentUpsert)
     }
 
     return NextResponse.json({ ok: true })
