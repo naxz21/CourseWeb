@@ -7,11 +7,18 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { title, price, courseId, userEmail, userId } = body
 
-    const appUrl = process.env.APP_URL || 'http://localhost:3000'
+    const appUrl = process.env.APP_URL
+
+    if (!appUrl) {
+      return NextResponse.json(
+        { error: 'Falta APP_URL en las variables de entorno' },
+        { status: 500 }
+      )
+    }
 
     if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
       return NextResponse.json(
-        { error: 'Falta MERCADOPAGO_ACCESS_TOKEN en .env.local' },
+        { error: 'Falta MERCADOPAGO_ACCESS_TOKEN en las variables de entorno' },
         { status: 500 }
       )
     }
@@ -54,7 +61,6 @@ export async function POST(req: Request) {
       (result as any)?.body?.sandbox_init_point
 
     if (!initPoint) {
-      console.log('Mercado Pago result:', result)
       return NextResponse.json(
         { error: 'Mercado Pago no devolvió init_point', result },
         { status: 500 }
@@ -64,6 +70,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ init_point: initPoint })
   } catch (error: any) {
     console.error('Error creating preference:', error)
+
     return NextResponse.json(
       {
         error: 'No se pudo crear la preferencia',
