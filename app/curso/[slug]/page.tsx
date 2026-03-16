@@ -41,34 +41,37 @@ export default async function CoursePage({
   if (!hasAccess) {
     return (
       <main className="p-8">
-       <div className="mb-6 flex gap-4">
-      <a
-       href="/dashboard"
-        className="inline-block rounded-lg border px-4 py-2"
-      >
-        ← Dashboard
-      </a>
+        <div className="mb-6 flex gap-4">
+          <a
+            href="/dashboard"
+            className="inline-block rounded-lg border px-4 py-2"
+          >
+            ← Dashboard
+          </a>
 
-      <a
-       href="/curso"
-        className="inline-block rounded-lg border px-4 py-2"
-      >
-        Ver cursos
-      </a>
-    </div>
+          <a
+            href="/curso"
+            className="inline-block rounded-lg border px-4 py-2"
+          >
+            Ver cursos
+          </a>
+        </div>
 
         <h1 className="text-3xl font-bold">{course.title}</h1>
         <p className="mt-4">{course.description}</p>
+
         {!hasAccess && (
-        <p className="mt-2 text-lg font-semibold">
-          Precio: ${course.price}
-        </p>
-    )}
-    {hasAccess && (
-  <div className="mt-4 rounded-xl bg-green-100 p-4 text-green-800">
-    Ya tenés acceso a este curso.
-  </div>
-)}
+          <p className="mt-2 text-lg font-semibold">
+            Precio: ${course.price}
+          </p>
+        )}
+
+        {hasAccess && (
+          <div className="mt-4 rounded-xl bg-green-100 p-4 text-green-800">
+            Ya tenés acceso a este curso.
+          </div>
+        )}
+
         <div className="mt-6 rounded-2xl border p-6">
           <h2 className="text-2xl font-semibold">Todavía no tenés acceso</h2>
           <p className="mt-2 text-gray-600">
@@ -102,6 +105,7 @@ export default async function CoursePage({
         lesson_type,
         video_url,
         pdf_url,
+        image_url,
         content,
         position
       )
@@ -111,12 +115,21 @@ export default async function CoursePage({
 
   return (
     <main className="p-8">
-      <a
-        href="/curso"
-        className="mb-6 inline-block rounded-lg border px-4 py-2"
-      >
-        ← Volver a cursos
-      </a>
+      <div className="mb-6 flex gap-4">
+        <a
+          href="/dashboard"
+          className="inline-block rounded-lg border px-4 py-2"
+        >
+          ← Dashboard
+        </a>
+
+        <a
+          href="/curso"
+          className="inline-block rounded-lg border px-4 py-2"
+        >
+          Ver cursos
+        </a>
+      </div>
 
       <h1 className="text-3xl font-bold">{course.title}</h1>
       <p className="mt-4">{course.description}</p>
@@ -170,10 +183,20 @@ export default async function CoursePage({
                             Ver video
                           </a>
                         )}
+
+                        {lesson.lesson_type === 'image' && lesson.image_url && (
+                          <img
+                            src={lesson.image_url}
+                            alt={lesson.title}
+                            className="mt-3 max-w-full rounded-xl border"
+                          />
+                        )}
                       </div>
                     ))
                 ) : (
-                  <p className="text-gray-500">Este módulo todavía no tiene lecciones.</p>
+                  <p className="text-gray-500">
+                    Este módulo todavía no tiene lecciones.
+                  </p>
                 )}
               </div>
             </div>

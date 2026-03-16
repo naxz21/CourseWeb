@@ -13,6 +13,14 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  const isAdmin = profile?.role === 'admin'
+
   const { data: enrollments, error } = await supabase
     .from('enrollments')
     .select(`
@@ -40,13 +48,22 @@ export default async function DashboardPage() {
         <LogoutButton />
       </div>
 
-      <div className="mt-6 flex gap-4">
+      <div className="mt-6 flex flex-wrap gap-4">
         <a
           href="/curso"
           className="inline-block rounded-lg bg-black px-4 py-2 text-white"
         >
           Ver todos los cursos
         </a>
+
+        {isAdmin && (
+          <a
+            href="/admin"
+            className="inline-block rounded-lg border px-4 py-2"
+          >
+            Panel admin
+          </a>
+        )}
       </div>
 
       <section className="mt-10">
