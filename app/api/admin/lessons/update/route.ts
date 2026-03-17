@@ -15,15 +15,16 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
+
     const {
       lessonId,
       moduleId,
       title,
       lessonType,
       content,
-      videoUrl,
-      pdfUrl,
-      imageUrl,
+      coverImageUrl,
+      coverStorageBucket,
+      coverStoragePath,
     } = body
 
     if (!lessonId || !moduleId || !title || !lessonType) {
@@ -33,26 +34,29 @@ export async function POST(req: Request) {
       )
     }
 
-    const result = await supabaseAdmin
+    const { error } = await supabaseAdmin
       .from('lessons')
       .update({
         module_id: moduleId,
         title,
         lesson_type: lessonType,
         content: content || null,
-        video_url: videoUrl || null,
-        pdf_url: pdfUrl || null,
-        image_url: imageUrl || null,
+        cover_image_url: coverImageUrl || null,
+        cover_storage_bucket: coverStorageBucket || null,
+        cover_storage_path: coverStoragePath || null,
       })
       .eq('id', lessonId)
 
-    if (result.error) {
-      return NextResponse.json({ error: result.error.message }, { status: 400 })
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     return NextResponse.json({ ok: true })
-  } catch (error) {
-    console.error(error)
-    return NextResponse.json({ error: 'Error al actualizar lección' }, { status: 500 })
+  } catch (error: any) {
+    console.error('UPDATE LESSON ERROR:', error)
+    return NextResponse.json(
+      { error: error?.message || 'Error al actualizar lección' },
+      { status: 500 }
+    )
   }
 }

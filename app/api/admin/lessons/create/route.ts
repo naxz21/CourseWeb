@@ -15,14 +15,15 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
+
     const {
       moduleId,
       title,
       lessonType,
       content,
-      videoUrl,
-      pdfUrl,
-      imageUrl,
+      coverImageUrl,
+      coverStorageBucket,
+      coverStoragePath,
     } = body
 
     if (!moduleId || !title || !lessonType) {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
       )
     }
 
-    const allowedTypes = ['text', 'video', 'pdf', 'image']
+    const allowedTypes = ['text', 'video', 'pdf', 'image', 'mixed']
     if (!allowedTypes.includes(lessonType)) {
       return NextResponse.json({ error: 'Tipo inválido' }, { status: 400 })
     }
@@ -54,24 +55,31 @@ export async function POST(req: Request) {
 
     const nextPosition = (lastLesson?.position || 0) + 1
 
-    const result = await supabaseAdmin.from('lessons').insert({
-      module_id: moduleId,
-      title,
-      lesson_type: lessonType,
-      content: content || null,
-      video_url: videoUrl || null,
-      pdf_url: pdfUrl || null,
-      image_url: imageUrl || null,
-      position: nextPosition,
-    })
+    const { data, error } = await supabaseAdmin
+      .from('lessons')
+      .insert({
+        module_id: moduleId,
+        title,
+        lesson_type: lessonType,
+        content: content || null,
+        cover_image_url: coverImageUrl || null,
+        cover_storage_bucket: coverStorageBucket || null,
+        cover_storage_path: coverStoragePath || null,
+        position: nextPosition,
+      })
+      .select('id')
+      .single()
 
-    if (result.error) {
-      return NextResponse.json({ error: result.error.message }, { status: 400 })
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    return NextResponse.json({ ok: true })
-  } catch (error) {
-    console.error(error)
-    return NextResponse.json({ error: 'Error al crear lección' }, { status: 500 })
+    return NextResponse.json({ ok: true, lessonId: data.id })
+  } catch (error: any) {
+    console.error('CREATE LESSON ERROR:', error)
+    return NextResponse.json(
+      { error: error?.message || 'Error al crear lección' },
+      { status: 500 }
+    )
   }
 }

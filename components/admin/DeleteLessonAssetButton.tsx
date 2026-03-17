@@ -13,36 +13,36 @@ async function parseJsonSafely(res: Response) {
   }
 }
 
-export default function DeleteLessonButton({
-  lessonId,
+export default function DeleteLessonAssetButton({
+  assetId,
 }: {
-  lessonId: string
+  assetId: string
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
   async function handleDelete() {
-    const confirmed = window.confirm('¿Seguro que querés eliminar esta lección?')
+    const confirmed = window.confirm('¿Eliminar este archivo?')
     if (!confirmed) return
 
     setLoading(true)
 
     try {
-      const res = await fetch('/api/admin/lessons/delete', {
+      const res = await fetch('/api/admin/lesson-assets/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lessonId }),
+        body: JSON.stringify({ assetId }),
       })
 
       const data = await parseJsonSafely(res)
 
       if (!res.ok) {
-        throw new Error(data.error || 'Error al eliminar lección')
+        throw new Error(data.error || 'Error al eliminar archivo')
       }
 
       router.refresh()
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Error al eliminar lección')
+      alert(error instanceof Error ? error.message : 'Error al eliminar archivo')
     } finally {
       setLoading(false)
     }
@@ -53,7 +53,7 @@ export default function DeleteLessonButton({
       type="button"
       onClick={handleDelete}
       disabled={loading}
-      className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/20 disabled:opacity-60"
+      className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-200 hover:bg-red-500/20 disabled:opacity-60"
     >
       {loading ? 'Eliminando...' : 'Eliminar'}
     </button>

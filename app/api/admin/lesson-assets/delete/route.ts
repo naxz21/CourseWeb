@@ -15,16 +15,16 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    const { lessonId } = body
+    const { assetId } = body
 
-    if (!lessonId) {
-      return NextResponse.json({ error: 'Falta lessonId' }, { status: 400 })
+    if (!assetId) {
+      return NextResponse.json({ error: 'Falta assetId' }, { status: 400 })
     }
 
     const { error } = await supabaseAdmin
-      .from('lessons')
+      .from('lesson_assets')
       .delete()
-      .eq('id', lessonId)
+      .eq('id', assetId)
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 })
@@ -32,9 +32,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true })
   } catch (error: any) {
-    console.error('DELETE LESSON ERROR:', error)
+    console.error('DELETE ASSET ERROR:', error)
     return NextResponse.json(
-      { error: error?.message || 'Error al eliminar lección' },
+      { error: error?.message || 'Error al eliminar asset' },
       { status: 500 }
     )
   }
