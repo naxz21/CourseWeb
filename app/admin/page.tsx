@@ -14,7 +14,7 @@ export default async function AdminPanelPage() {
         <div>
           <h1 className="text-3xl font-bold">Panel admin</h1>
           <p className="mt-2 text-gray-600">
-            Administrá cursos, módulos y lecciones.
+            Administrá cursos, módulos, lecciones y perfiles.
           </p>
         </div>
 
@@ -23,7 +23,7 @@ export default async function AdminPanelPage() {
         </Link>
       </div>
 
-      <section className="mt-8 grid gap-4 md:grid-cols-3">
+      <section className="mt-8 grid gap-4 md:grid-cols-4">
         <Link href="/admin/cursos" className="rounded-2xl border p-6 shadow-sm">
           <h2 className="text-2xl font-semibold">Cursos</h2>
           <p className="mt-2 text-gray-600">Crear, editar y eliminar cursos.</p>
@@ -37,6 +37,13 @@ export default async function AdminPanelPage() {
         <Link href="/admin/lecciones" className="rounded-2xl border p-6 shadow-sm">
           <h2 className="text-2xl font-semibold">Lecciones</h2>
           <p className="mt-2 text-gray-600">Crear y ordenar lecciones.</p>
+        </Link>
+
+        <Link href="/admin/profiles" className="rounded-2xl border p-6 shadow-sm">
+          <h2 className="text-2xl font-semibold">Perfiles</h2>
+          <p className="mt-2 text-gray-600">
+            Ver todos los perfiles registrados.
+          </p>
         </Link>
       </section>
     </main>

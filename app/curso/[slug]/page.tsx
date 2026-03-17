@@ -60,6 +60,15 @@ export default async function CoursePage({
   return (
     <main className="min-h-screen bg-black p-8 text-white">
       <div className="mx-auto max-w-6xl space-y-8">
+        <div>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
+          >
+            ← Volver al dashboard
+          </Link>
+        </div>
+
         <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-3xl">
