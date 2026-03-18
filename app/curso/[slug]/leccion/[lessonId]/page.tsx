@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import LessonProgressControls from '@/components/LessonProgressControls'
 
 export default async function LessonPage({
   params,
@@ -74,7 +75,7 @@ export default async function LessonPage({
 
   const { data: moduleData } = await supabaseAdmin
     .from('modules')
-    .select('id, title, course_id')
+    .select('id, title, course_id, position')
     .eq('id', lesson.module_id)
     .maybeSingle()
 
@@ -85,6 +86,65 @@ export default async function LessonPage({
   if (moduleData.course_id !== course.id) {
     notFound()
   }
+
+  const { data: modules } = await supabaseAdmin
+    .from('modules')
+    .select('id, title, position')
+    .eq('course_id', course.id)
+    .order('position', { ascending: true })
+
+  const moduleIds = (modules || []).map((m) => m.id)
+
+  const { data: allLessons } = await supabaseAdmin
+    .from('lessons')
+    .select('id, module_id, title, position')
+    .in(
+      'module_id',
+      moduleIds.length > 0
+        ? moduleIds
+        : ['00000000-0000-0000-0000-000000000000']
+    )
+    .order('position', { ascending: true })
+
+  const orderedLessons =
+    modules?.flatMap((module) =>
+      (allLessons || [])
+        .filter((l) => l.module_id === module.id)
+        .sort((a, b) => a.position - b.position)
+        .map((l) => ({
+          ...l,
+          moduleTitle: module.title,
+          modulePosition: module.position,
+        }))
+    ) || []
+
+  const currentIndex = orderedLessons.findIndex((l) => l.id === lesson.id)
+  const previousLesson = currentIndex > 0 ? orderedLessons[currentIndex - 1] : null
+  const nextLesson =
+    currentIndex >= 0 && currentIndex < orderedLessons.length - 1
+      ? orderedLessons[currentIndex + 1]
+      : null
+
+  const { data: progress } = await supabase
+    .from('lesson_progress')
+    .select('lesson_id, completed, last_viewed_at')
+    .eq('user_id', user.id)
+    .eq('course_id', course.id)
+
+  const progressMap = new Map(
+    (progress || []).map((item) => [item.lesson_id, item])
+  )
+
+  const currentProgress = progressMap.get(lesson.id)
+  const isCompleted = !!currentProgress?.completed
+
+  const totalLessons = orderedLessons.length
+  const completedLessons = orderedLessons.filter((item) =>
+    progressMap.get(item.id)?.completed
+  ).length
+
+  const progressPercent =
+    totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
 
   const { data: assets } = await supabaseAdmin
     .from('lesson_assets')
@@ -100,12 +160,19 @@ export default async function LessonPage({
   return (
     <main className="min-h-screen bg-black p-8 text-white">
       <div className="mx-auto max-w-5xl space-y-8">
-        <Link
-          href={`/curso/${slug}`}
-          className="inline-block rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm"
-        >
-          ← Volver
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href={`/curso/${slug}`}
+            className="inline-block rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm"
+          >
+            ← Volver
+          </Link>
+
+          <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300">
+            Progreso del curso: {completedLessons}/{totalLessons} ({progressPercent}
+            %)
+          </div>
+        </div>
 
         <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
           {lesson.cover_image_url && (
@@ -123,10 +190,60 @@ export default async function LessonPage({
 
             <h1 className="mt-2 text-3xl font-bold">{lesson.title}</h1>
 
+            <div className="mt-4">
+              <div className="h-3 w-full overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-white"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <LessonProgressControls
+                courseId={course.id}
+                moduleId={lesson.module_id}
+                lessonId={lesson.id}
+                initialCompleted={isCompleted}
+              />
+            </div>
+
             {lesson.content && (
-              <p className="mt-4 whitespace-pre-line text-gray-300">
+              <p className="mt-6 whitespace-pre-line text-gray-300">
                 {lesson.content}
               </p>
+            )}
+          </div>
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <p className="mb-2 text-sm text-gray-400">Lección anterior</p>
+
+            {previousLesson ? (
+              <Link
+                href={`/curso/${slug}/leccion/${previousLesson.id}`}
+                className="inline-block rounded-xl bg-white px-4 py-2 text-sm font-medium text-black"
+              >
+                ← {previousLesson.title}
+              </Link>
+            ) : (
+              <p className="text-sm text-gray-500">Esta es la primera lección</p>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <p className="mb-2 text-sm text-gray-400">Lección siguiente</p>
+
+            {nextLesson ? (
+              <Link
+                href={`/curso/${slug}/leccion/${nextLesson.id}`}
+                className="inline-block rounded-xl bg-white px-4 py-2 text-sm font-medium text-black"
+              >
+                {nextLesson.title} →
+              </Link>
+            ) : (
+              <p className="text-sm text-gray-500">Esta es la última lección</p>
             )}
           </div>
         </section>
@@ -155,7 +272,7 @@ export default async function LessonPage({
         )}
 
         {pdfs.length > 0 && (
-          <section className="space-y-4">
+          <section className="space-y-6">
             <h2 className="text-2xl font-semibold">PDFs</h2>
 
             {pdfs.map((p: any) => (
@@ -163,11 +280,11 @@ export default async function LessonPage({
                 key={p.id}
                 className="rounded-2xl border border-white/10 bg-black/20 p-4"
               >
-                <p className="mb-3 text-sm font-medium text-white">
+                <p className="mb-4 text-sm font-medium text-white">
                   {p.title || 'PDF'}
                 </p>
 
-                <div className="flex flex-wrap gap-3">
+                <div className="mb-4 flex flex-wrap gap-3">
                   <a
                     href={p.file_url}
                     target="_blank"
@@ -185,6 +302,18 @@ export default async function LessonPage({
                     Descargar
                   </a>
                 </div>
+
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white">
+                  <iframe
+                    src={p.file_url}
+                    title={p.title || 'PDF'}
+                    className="h-200 w-full"
+                  />
+                </div>
+
+                <p className="mt-3 text-xs text-gray-400">
+                  Si no se visualiza dentro de la página, usá “Abrir PDF”.
+                </p>
               </div>
             ))}
           </section>
