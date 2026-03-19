@@ -37,6 +37,9 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .eq('status', 'active')
 
+  console.log('dashboard enrollments error:', error)
+  console.log('dashboard enrollments data:', enrollments)
+
   return (
     <main className="min-h-screen p-8">
       <div className="flex items-start justify-between gap-4">
@@ -70,9 +73,12 @@ export default async function DashboardPage() {
         <h2 className="text-2xl font-semibold">Mis cursos</h2>
 
         {error && (
-          <p className="mt-4 text-red-600">
-            Ocurrió un error al cargar tus cursos.
-          </p>
+          <div className="mt-4 text-red-600">
+            <p>Ocurrió un error al cargar tus cursos.</p>
+            <pre className="mt-2 whitespace-pre-wrap text-sm">
+              {error.message}
+            </pre>
+          </div>
         )}
 
         {!error && enrollments && enrollments.length > 0 ? (
