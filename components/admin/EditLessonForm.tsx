@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import DeleteLessonAssetButton from '@/components/admin/DeleteLessonAssetButton'
 
 type Module = {
@@ -33,12 +34,18 @@ type Lesson = {
 
 async function parseJsonSafely(res: Response) {
   const text = await res.text()
-
   try {
     return JSON.parse(text)
   } catch {
     throw new Error(text || 'El servidor devolvió una respuesta inválida')
   }
+}
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) return {}
+  return { Authorization: `Bearer ${session.access_token}` }
 }
 
 export default function EditLessonForm({
@@ -73,6 +80,8 @@ export default function EditLessonForm({
   ) {
     if (!files.length) return []
 
+    const authHeaders = await getAuthHeaders()
+
     const formData = new FormData()
     files.forEach((file) => formData.append('files', file))
     formData.append('assetType', assetType)
@@ -80,6 +89,7 @@ export default function EditLessonForm({
 
     const res = await fetch('/api/admin/lesson-assets/upload', {
       method: 'POST',
+      headers: authHeaders,
       body: formData,
     })
 
@@ -120,11 +130,13 @@ export default function EditLessonForm({
     setLoading(true)
 
     try {
+      const authHeaders = await getAuthHeaders()
+
       const cover = await uploadCover(lesson.id)
 
       const updateRes = await fetch('/api/admin/lessons/update', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({
           lessonId: lesson.id,
           moduleId,
@@ -189,7 +201,7 @@ export default function EditLessonForm({
       if (newAssets.length > 0) {
         const assetsRes = await fetch('/api/admin/lesson-assets/create-many', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
           body: JSON.stringify({
             lessonId: lesson.id,
             assets: newAssets,
@@ -346,3 +358,4 @@ export default function EditLessonForm({
     </form>
   )
 }
+
