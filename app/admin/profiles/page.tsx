@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/auth/is-admin'
-import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 type SearchParams = Promise<{
   q?: string
@@ -22,9 +22,7 @@ export default async function AdminProfilesPage({
   const q = params.q?.trim() || ''
   const role = params.role?.trim() || 'all'
 
-  const supabase = await createClient()
-
-  let query = supabase
+  let query = supabaseAdmin
     .from('profiles')
     .select(`
       id,
@@ -37,7 +35,8 @@ export default async function AdminProfilesPage({
       country,
       document_type,
       document_number,
-      profession
+      profession,
+      created_at
     `)
     .order('full_name', { ascending: true, nullsFirst: false })
     .order('email', { ascending: true })
@@ -116,7 +115,7 @@ export default async function AdminProfilesPage({
 
       {error && (
         <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-red-300">
-          Ocurrió un error al cargar los perfiles.
+          Ocurrió un error al cargar los perfiles: {error.message}
         </div>
       )}
 
