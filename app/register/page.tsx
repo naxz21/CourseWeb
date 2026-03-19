@@ -80,12 +80,15 @@ export default function RegisterPage() {
     }
 
     if (data.user) {
+      // ✅ Ahora pasamos userId y email en el body — la API ya no depende de la sesión
       const res = await fetch('/api/profile/ensure', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId: data.user.id,
+          email: data.user.email,
           full_name: fullName.trim(),
           address: address.trim(),
           city: city.trim(),
@@ -98,8 +101,8 @@ export default function RegisterPage() {
       })
 
       if (!res.ok) {
-        const data = await res.json().catch(() => null)
-        setMessage(data?.error || 'Se creó la cuenta, pero no se pudo guardar el perfil.')
+        const resData = await res.json().catch(() => null)
+        setMessage(resData?.error || 'Se creó la cuenta, pero no se pudo guardar el perfil.')
         setLoading(false)
         return
       }
@@ -109,7 +112,7 @@ export default function RegisterPage() {
       return
     }
 
-    setMessage('Registro realizado. Ahora iniciá sesión.')
+    setMessage('Registro realizado. Revisá tu email para confirmar la cuenta.')
     setLoading(false)
   }
 
