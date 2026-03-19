@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/auth/is-admin'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminFromRequest } from '@/lib/auth/is-admin'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
@@ -23,9 +23,9 @@ function getFolderByType(type: string) {
   return 'others'
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { user, isAdmin } = await requireAdmin()
+    const { user, isAdmin } = await requireAdminFromRequest(req)
 
     if (!user) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
@@ -36,7 +36,6 @@ export async function POST(req: Request) {
     }
 
     const formData = await req.formData()
-
     const files = formData.getAll('files') as File[]
     const assetType = String(formData.get('assetType') || '')
     const lessonId = String(formData.get('lessonId') || '')
@@ -62,11 +61,7 @@ export async function POST(req: Request) {
 
     for (const file of files) {
       const maxSizeMb =
-        assetType === 'video'
-          ? 200
-          : assetType === 'pdf'
-          ? 30
-          : 15
+        assetType === 'video' ? 200 : assetType === 'pdf' ? 30 : 15
 
       if (file.size > maxSizeMb * 1024 * 1024) {
         return NextResponse.json(
@@ -83,25 +78,13 @@ export async function POST(req: Request) {
       const uint8 = new Uint8Array(arrayBuffer)
 
       let contentType = file.type || 'application/octet-stream'
-
-      if (assetType === 'pdf') {
-        contentType = 'application/pdf'
-      }
-
-      if (assetType === 'image' && !contentType.startsWith('image/')) {
-        contentType = 'image/jpeg'
-      }
-
-      if (assetType === 'video' && !contentType.startsWith('video/')) {
-        contentType = 'video/mp4'
-      }
+      if (assetType === 'pdf') contentType = 'application/pdf'
+      if (assetType === 'image' && !contentType.startsWith('image/')) contentType = 'image/jpeg'
+      if (assetType === 'video' && !contentType.startsWith('video/')) contentType = 'video/mp4'
 
       const { error } = await supabaseAdmin.storage
         .from(BUCKET)
-        .upload(path, uint8, {
-          contentType,
-          upsert: false,
-        })
+        .upload(path, uint8, { contentType, upsert: false })
 
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 400 })
@@ -117,13 +100,9 @@ export async function POST(req: Request) {
       })
     }
 
-    return NextResponse.json({
-      ok: true,
-      files: uploaded,
-    })
+    return NextResponse.json({ ok: true, files: uploaded })
   } catch (err: any) {
     console.error('UPLOAD ASSET ERROR:', err)
-
     return NextResponse.json(
       { error: err?.message || 'Error al subir archivos' },
       { status: 500 }

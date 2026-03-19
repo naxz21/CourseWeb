@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 type Module = {
   id: string
@@ -27,12 +28,18 @@ type UploadedAsset = {
 
 async function parseJsonSafely(res: Response) {
   const text = await res.text()
-
   try {
     return JSON.parse(text)
   } catch {
     throw new Error(text || 'El servidor devolvió una respuesta inválida')
   }
+}
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) return {}
+  return { Authorization: `Bearer ${session.access_token}` }
 }
 
 export default function CreateLessonForm({
@@ -71,6 +78,8 @@ export default function CreateLessonForm({
   ) {
     if (!files.length) return []
 
+    const authHeaders = await getAuthHeaders()
+
     const formData = new FormData()
     files.forEach((file) => formData.append('files', file))
     formData.append('assetType', assetType)
@@ -78,6 +87,7 @@ export default function CreateLessonForm({
 
     const res = await fetch('/api/admin/lesson-assets/upload', {
       method: 'POST',
+      headers: authHeaders, // sin Content-Type, lo pone el browser para FormData
       body: formData,
     })
 
@@ -102,9 +112,11 @@ export default function CreateLessonForm({
     let createdLessonId: string | null = null
 
     try {
+      const authHeaders = await getAuthHeaders()
+
       const createRes = await fetch('/api/admin/lessons/create', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({
           moduleId,
           title,
@@ -178,7 +190,7 @@ export default function CreateLessonForm({
 
       const updateRes = await fetch('/api/admin/lessons/update', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({
           lessonId,
           moduleId,
@@ -200,11 +212,8 @@ export default function CreateLessonForm({
       if (allAssets.length > 0) {
         const assetsRes = await fetch('/api/admin/lesson-assets/create-many', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lessonId,
-            assets: allAssets,
-          }),
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
+          body: JSON.stringify({ lessonId, assets: allAssets }),
         })
 
         const assetsData = await parseJsonSafely(assetsRes)
@@ -227,9 +236,10 @@ export default function CreateLessonForm({
     } catch (error) {
       if (createdLessonId) {
         try {
+          const authHeaders = await getAuthHeaders()
           await fetch('/api/admin/lessons/delete', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
             body: JSON.stringify({ lessonId: createdLessonId }),
           })
         } catch {}

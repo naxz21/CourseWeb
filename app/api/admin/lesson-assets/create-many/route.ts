@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/auth/is-admin'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminFromRequest } from '@/lib/auth/is-admin'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { user, isAdmin } = await requireAdmin()
+    const { user, isAdmin } = await requireAdminFromRequest(req)
 
     if (!user) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
@@ -19,10 +19,6 @@ export async function POST(req: Request) {
 
     const body = await req.json()
     const { lessonId, assets } = body
-
-    console.log('CREATE MANY ROUTE HIT')
-    console.log('lessonId:', lessonId)
-    console.log('assets:', assets)
 
     if (!lessonId || !Array.isArray(assets)) {
       return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 })

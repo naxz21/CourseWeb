@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/auth/is-admin'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminFromRequest } from '@/lib/auth/is-admin'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
-export async function POST(req: Request) {
-  const { user, isAdmin } = await requireAdmin()
+export async function POST(req: NextRequest) {
+  const { user, isAdmin } = await requireAdminFromRequest(req)
 
   if (!user) {
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
