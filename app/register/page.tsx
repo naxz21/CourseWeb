@@ -107,13 +107,10 @@ export default function RegisterPage() {
         return
       }
 
-      router.push('/dashboard')
-      router.refresh()
+      setMessage('¡Cuenta creada! Te enviamos un email de confirmación. Revisá tu bandeja de entrada antes de iniciar sesión.')
+      setLoading(false)
       return
     }
-
-    setMessage('Registro realizado. Revisá tu email para confirmar la cuenta.')
-    setLoading(false)
   }
 
   return (

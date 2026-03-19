@@ -196,13 +196,13 @@ export default async function CoursePage({
 
             {!hasAccess && (
               <div className="shrink-0">
-                <BuyButton
-                  courseId={course.id}
-                  title={''}
-                  price={0}
-                  userEmail={''}
-                  userId={''}
-                />
+            <BuyButton
+  courseId={course.id}
+  title={course.title}
+  price={course.price}
+  userEmail={user.email ?? ''}
+  userId={user.id}
+/>
               </div>
             )}
           </div>
