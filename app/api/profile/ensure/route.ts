@@ -14,33 +14,36 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
     }
 
-    let body: Record<string, unknown> = {}
-
-    try {
-      body = await req.json()
-    } catch {
-      body = {}
-    }
-
-    const payload: Record<string, unknown> = {
-      id: user.id,
-      email: user.email,
-    }
-
-    if (body.full_name !== undefined) payload.full_name = body.full_name
-    if (body.address !== undefined) payload.address = body.address
-    if (body.city !== undefined) payload.city = body.city
-    if (body.state !== undefined) payload.state = body.state
-    if (body.country !== undefined) payload.country = body.country
-    if (body.document_type !== undefined) payload.document_type = body.document_type
-    if (body.document_number !== undefined) payload.document_number = body.document_number
-    if (body.profession !== undefined) payload.profession = body.profession
+    const body = await req.json().catch(() => ({}))
 
     const result = await supabaseAdmin
       .from('profiles')
-      .upsert(payload, { onConflict: 'id' })
+      .upsert(
+        {
+          id: user.id,
+          email: user.email,
+          full_name: body.full_name ?? null,
+          address: body.address ?? null,
+          city: body.city ?? null,
+          state: body.state ?? null,
+          country: body.country ?? null,
+          document_type: body.document_type ?? null,
+          document_number: body.document_number ?? null,
+          profession: body.profession ?? null,
+        },
+        { onConflict: 'id' }
+      )
+      .select()
+      .single()
 
-    return NextResponse.json({ ok: true, result })
+    if (result.error) {
+      return NextResponse.json(
+        { error: result.error.message },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ ok: true, profile: result.data })
   } catch (error) {
     console.error('ensure profile error:', error)
     return NextResponse.json(
