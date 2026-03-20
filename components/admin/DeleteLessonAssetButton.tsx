@@ -2,10 +2,10 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 async function parseJsonSafely(res: Response) {
   const text = await res.text()
-
   try {
     return JSON.parse(text)
   } catch {
@@ -13,11 +13,14 @@ async function parseJsonSafely(res: Response) {
   }
 }
 
-export default function DeleteLessonAssetButton({
-  assetId,
-}: {
-  assetId: string
-}) {
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) return {}
+  return { Authorization: `Bearer ${session.access_token}` }
+}
+
+export default function DeleteLessonAssetButton({ assetId }: { assetId: string }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
@@ -28,9 +31,10 @@ export default function DeleteLessonAssetButton({
     setLoading(true)
 
     try {
+      const authHeaders = await getAuthHeaders()
       const res = await fetch('/api/admin/lesson-assets/delete', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({ assetId }),
       })
 

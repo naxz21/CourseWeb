@@ -2,6 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) return {}
+  return { Authorization: `Bearer ${session.access_token}` }
+}
 
 export default function DeleteModuleButton({ moduleId }: { moduleId: string }) {
   const router = useRouter()
@@ -13,21 +21,27 @@ export default function DeleteModuleButton({ moduleId }: { moduleId: string }) {
 
     setLoading(true)
 
-    const res = await fetch('/api/admin/modules/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ moduleId }),
-    })
+    try {
+      const authHeaders = await getAuthHeaders()
+      const res = await fetch('/api/admin/modules/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        body: JSON.stringify({ moduleId }),
+      })
 
-    const data = await res.json()
+      const data = await res.json()
 
-    if (!res.ok) {
-      alert(data.error || 'Error al eliminar módulo')
+      if (!res.ok) {
+        alert(data.error || 'Error al eliminar módulo')
+        return
+      }
+
+      router.refresh()
+    } catch (error) {
+      alert('Error al eliminar módulo')
+    } finally {
       setLoading(false)
-      return
     }
-
-    router.refresh()
   }
 
   return (

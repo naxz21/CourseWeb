@@ -2,6 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) return {}
+  return { Authorization: `Bearer ${session.access_token}` }
+}
 
 export default function DeleteCourseButton({ courseId }: { courseId: string }) {
   const router = useRouter()
@@ -13,21 +21,27 @@ export default function DeleteCourseButton({ courseId }: { courseId: string }) {
 
     setLoading(true)
 
-    const res = await fetch('/api/admin/courses/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ courseId }),
-    })
+    try {
+      const authHeaders = await getAuthHeaders()
+      const res = await fetch('/api/admin/courses/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        body: JSON.stringify({ courseId }),
+      })
 
-    const data = await res.json()
+      const data = await res.json()
 
-    if (!res.ok) {
-      alert(data.error || 'Error al eliminar curso')
+      if (!res.ok) {
+        alert(data.error || 'Error al eliminar curso')
+        return
+      }
+
+      router.refresh()
+    } catch (error) {
+      alert('Error al eliminar curso')
+    } finally {
       setLoading(false)
-      return
     }
-
-    router.refresh()
   }
 
   return (
