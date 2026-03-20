@@ -18,10 +18,7 @@ export default function LoginPage() {
     setLoading(true)
     setMessage('')
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       setMessage(error.message)
@@ -29,50 +26,93 @@ export default function LoginPage() {
       return
     }
 
-    await fetch('/api/profile/ensure', {
-      method: 'POST',
-    })
-
+    await fetch('/api/profile/ensure', { method: 'POST' })
     router.push('/dashboard')
     router.refresh()
   }
 
+  const inputStyle = {
+    width: '100%',
+    padding: '0.75rem 1rem',
+    borderRadius: '0.75rem',
+    border: '1.5px solid rgba(74,124,63,0.3)',
+    background: 'rgba(255,255,255,0.7)',
+    color: '#2C2C2C',
+    fontSize: '0.95rem',
+    fontFamily: 'Georgia, serif',
+    outline: 'none',
+    boxSizing: 'border-box' as const,
+  }
+
+  const labelStyle = {
+    fontSize: '0.8rem',
+    color: '#4A7C3F',
+    letterSpacing: '0.05em',
+    display: 'block' as const,
+    marginBottom: '0.4rem',
+  }
+
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <form
-        onSubmit={handleLogin}
-        className="w-full max-w-md space-y-4 rounded-2xl border p-6 shadow-sm"
-      >
-        <h1 className="text-2xl font-bold">Iniciar sesión</h1>
-
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2"
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2"
-          required
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-black px-4 py-2 text-white disabled:opacity-60"
+    <main
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(160deg, #F5F2E8 0%, #EDE8D5 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1.5rem',
+        fontFamily: 'Georgia, serif',
+      }}
+    >
+      <div style={{ width: '100%', maxWidth: '420px' }}>
+        <div
+          style={{
+            background: 'rgba(255,255,255,0.6)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(74,124,63,0.2)',
+            borderRadius: '1.5rem',
+            padding: '2.5rem 2rem',
+            boxShadow: '0 8px 40px rgba(74,124,63,0.08)',
+          }}
         >
-          {loading ? 'Ingresando...' : 'Ingresar'}
-        </button>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: '400', color: '#2D5A27', marginBottom: '0.5rem', textAlign: 'center' }}>
+            Bienvenido de vuelta
+          </h1>
+          <p style={{ fontSize: '0.875rem', color: '#5C5C4A', textAlign: 'center', marginBottom: '2rem' }}>
+            Ingresá tu cuenta para continuar
+          </p>
 
-        {message && <p className="text-sm text-red-600">{message}</p>}
-      </form>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label style={labelStyle}>Correo electrónico</label>
+              <input type="email" placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} required />
+            </div>
+            <div>
+              <label style={labelStyle}>Contraseña</label>
+              <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} required />
+            </div>
+
+            {message && (
+              <div style={{ background: 'rgba(180,60,40,0.08)', border: '1px solid rgba(180,60,40,0.2)', borderRadius: '0.75rem', padding: '0.75rem 1rem', fontSize: '0.875rem', color: '#8B2500' }}>
+                {message}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{ marginTop: '0.5rem', padding: '0.875rem', borderRadius: '999px', background: loading ? '#7aaa6f' : '#4A7C3F', color: '#F5F2E8', fontSize: '1rem', fontFamily: 'Georgia, serif', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', letterSpacing: '0.03em', boxShadow: '0 4px 16px rgba(74,124,63,0.2)' }}
+            >
+              {loading ? 'Ingresando...' : 'Ingresar'}
+            </button>
+          </form>
+
+          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: '#5C5C4A' }}>
+            ¿No tenés cuenta?{' '}
+            <a href="/register" style={{ color: '#4A7C3F', textDecoration: 'none', fontWeight: 'bold' }}>Registrarse</a>
+          </p>
+        </div>
+      </div>
     </main>
   )
 }

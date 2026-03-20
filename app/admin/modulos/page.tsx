@@ -8,111 +8,58 @@ import MoveModuleButtons from '@/components/admin/MoveModuleButtons'
 
 export default async function AdminModulosPage() {
   const { user, isAdmin } = await requireAdmin()
-
   if (!user) redirect('/login')
   if (!isAdmin) redirect('/dashboard')
 
   const supabase = await createClient()
-
   const [{ data: courses }, { data: modules }] = await Promise.all([
     supabase.from('courses').select('id, title, slug').order('title', { ascending: true }),
-    supabase
-      .from('modules')
-      .select(`
-        id,
-        title,
-        description,
-        position,
-        course_id,
-        courses (
-          id,
-          title
-        )
-      `)
-      .order('course_id', { ascending: true })
-      .order('position', { ascending: true }),
+    supabase.from('modules').select(`id, title, description, position, course_id, courses ( id, title )`).order('course_id', { ascending: true }).order('position', { ascending: true }),
   ])
 
   return (
-    <main className="min-h-screen bg-black px-6 py-8 text-white">
-      <div className="mx-auto max-w-7xl">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-4xl font-bold">Administrar módulos</h1>
-            <p className="mt-2 text-gray-400">
-              Creá, editá y ordená módulos por curso.
-            </p>
-          </div>
+    <main style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F5F2E8 0%, #EDE8D5 100%)', fontFamily: 'Georgia, serif' }}>
+      <header style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(74,124,63,0.15)', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4A7C3F' }}>Admin · Módulos</span>
+        <Link href="/admin" style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', border: '1.5px solid #4A7C3F', color: '#4A7C3F', fontSize: '0.875rem', textDecoration: 'none' }}>← Volver</Link>
+      </header>
 
-          <Link
-            href="/admin"
-            className="rounded-xl border border-white/30 px-4 py-2 text-white transition hover:bg-white hover:text-black"
-          >
-            ← Volver
-          </Link>
+      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem 1.5rem' }}>
+        <div style={{ marginBottom: '2.5rem' }}>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.5rem' }}>Administración</p>
+          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: '400', color: '#2D5A27' }}>Módulos</h1>
         </div>
 
-        <section className="mt-8 rounded-3xl border border-white/30 p-6">
-          <h2 className="text-2xl font-bold">Crear módulo</h2>
-          <div className="mt-4">
-            <CreateModuleForm
-              courses={(courses as any) || []}
-              existingModules={(modules as any) || []}
-            />
-          </div>
+        <section style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '1.5rem', padding: '2rem', marginBottom: '2.5rem', boxShadow: '0 4px 20px rgba(74,124,63,0.06)' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: '400', color: '#2D5A27', marginBottom: '1.5rem' }}>Crear nuevo módulo</h2>
+          <CreateModuleForm courses={(courses as any) || []} existingModules={(modules as any) || []} />
         </section>
 
-        <section className="mt-10">
-          <h2 className="text-3xl font-bold">Módulos por curso</h2>
-
-          <div className="mt-6 space-y-6">
+        <section>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: '400', color: '#2D5A27', marginBottom: '1.5rem' }}>Módulos por curso</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {courses?.map((course: any) => {
-              const courseModules = (modules || [])
-                .filter((module: any) => module.course_id === course.id)
-                .sort((a: any, b: any) => a.position - b.position)
-
+              const courseModules = (modules || []).filter((m: any) => m.course_id === course.id).sort((a: any, b: any) => a.position - b.position)
               return (
-                <div
-                  key={course.id}
-                  className="rounded-3xl border border-white/30 p-6"
-                >
-                  <h3 className="text-2xl font-bold">{course.title}</h3>
-                  <p className="mt-2 text-sm text-gray-400">Slug: {course.slug}</p>
-
-                  <div className="mt-6 grid gap-4">
+                <div key={course.id} style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '1.25rem', padding: '1.5rem', boxShadow: '0 2px 12px rgba(74,124,63,0.06)' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '400', color: '#2D5A27', marginBottom: '0.25rem' }}>{course.title}</h3>
+                  <p style={{ fontSize: '0.8rem', color: '#8B6914', marginBottom: '1.25rem' }}>/{course.slug}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {courseModules.length === 0 && (
-                      <div className="rounded-3xl border border-white/20 p-6 text-gray-400">
+                      <p style={{ fontSize: '0.875rem', color: '#5C5C4A', fontStyle: 'italic', padding: '1rem', border: '1px dashed rgba(74,124,63,0.2)', borderRadius: '0.75rem', textAlign: 'center' }}>
                         Este curso no tiene módulos todavía.
-                      </div>
+                      </p>
                     )}
-
                     {courseModules.map((module: any) => (
-                      <div
-                        key={module.id}
-                        className="rounded-3xl border border-white/20 p-6"
-                      >
-                        <h4 className="text-xl font-bold">
-                          {module.position}. {module.title}
-                        </h4>
-
-                        <p className="mt-2 text-sm text-gray-400">
-                          Posición: {module.position}
-                        </p>
-
-                        {module.description && (
-                          <p className="mt-4 text-gray-300">{module.description}</p>
-                        )}
-
-                        <div className="mt-6 flex flex-wrap gap-3">
+                      <div key={module.id} style={{ background: 'rgba(245,242,232,0.8)', border: '1px solid rgba(74,124,63,0.15)', borderRadius: '1rem', padding: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                        <div>
+                          <p style={{ fontSize: '0.7rem', color: '#8B6914', marginBottom: '0.25rem' }}>Módulo {module.position}</p>
+                          <h4 style={{ fontSize: '1rem', fontWeight: '400', color: '#2D5A27' }}>{module.title}</h4>
+                          {module.description && <p style={{ fontSize: '0.85rem', color: '#5C5C4A', marginTop: '0.25rem' }}>{module.description}</p>}
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                           <MoveModuleButtons moduleId={module.id} />
-
-                          <Link
-                            href={`/admin/modulos/${module.id}`}
-                            className="rounded-xl border border-white/60 px-5 py-2 text-white transition hover:bg-white hover:text-black"
-                          >
-                            Editar
-                          </Link>
-
+                          <Link href={`/admin/modulos/${module.id}`} style={{ padding: '0.4rem 1rem', borderRadius: '999px', border: '1.5px solid #4A7C3F', color: '#4A7C3F', fontSize: '0.8rem', textDecoration: 'none' }}>Editar</Link>
                           <DeleteModuleButton moduleId={module.id} />
                         </div>
                       </div>

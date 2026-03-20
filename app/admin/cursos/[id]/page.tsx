@@ -10,55 +10,36 @@ export default async function EditCoursePage({
   params: Promise<{ id: string }>
 }) {
   const { user, isAdmin } = await requireAdmin()
-
   if (!user) redirect('/login')
   if (!isAdmin) redirect('/dashboard')
 
   const { id } = await params
   const supabase = await createClient()
-
-  const { data: course, error } = await supabase
-    .from('courses')
-    .select('*')
-    .eq('id', id)
-    .single()
+  const { data: course, error } = await supabase.from('courses').select('*').eq('id', id).single()
 
   if (error || !course) {
     return (
-      <main className="min-h-screen bg-black px-6 py-8 text-white">
-        <div className="mx-auto max-w-5xl">
-          <h1 className="text-3xl font-bold">Curso no encontrado</h1>
-          <Link
-            href="/admin/cursos"
-            className="mt-4 inline-block rounded-xl border border-white/30 px-4 py-2 text-white transition hover:bg-white hover:text-black"
-          >
-            ← Volver
-          </Link>
-        </div>
+      <main style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F5F2E8 0%, #EDE8D5 100%)', fontFamily: 'Georgia, serif', padding: '3rem 2rem' }}>
+        <h1 style={{ color: '#2D5A27', marginBottom: '1rem' }}>Curso no encontrado</h1>
+        <Link href="/admin/cursos" style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', border: '1.5px solid #4A7C3F', color: '#4A7C3F', textDecoration: 'none', fontSize: '0.875rem' }}>← Volver</Link>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-black px-6 py-8 text-white">
-      <div className="mx-auto max-w-5xl">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-4xl font-bold">Editar curso</h1>
-            <p className="mt-2 text-gray-400">
-              Modificá la información del curso.
-            </p>
-          </div>
+    <main style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F5F2E8 0%, #EDE8D5 100%)', fontFamily: 'Georgia, serif' }}>
+      <header style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(74,124,63,0.15)', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4A7C3F' }}>Admin · Cursos · Editar</span>
+        <Link href="/admin/cursos" style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', border: '1.5px solid #4A7C3F', color: '#4A7C3F', fontSize: '0.875rem', textDecoration: 'none' }}>← Volver</Link>
+      </header>
 
-          <Link
-            href="/admin/cursos"
-            className="rounded-xl border border-white/30 px-4 py-2 text-white transition hover:bg-white hover:text-black"
-          >
-            ← Volver
-          </Link>
+      <div style={{ maxWidth: '700px', margin: '0 auto', padding: '3rem 1.5rem' }}>
+        <div style={{ marginBottom: '2.5rem' }}>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.5rem' }}>Administración</p>
+          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: '400', color: '#2D5A27' }}>Editar curso</h1>
         </div>
 
-        <section className="mt-8 rounded-3xl border border-white/30 p-6">
+        <section style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '1.5rem', padding: '2rem', boxShadow: '0 4px 20px rgba(74,124,63,0.06)' }}>
           <EditCourseForm course={course} />
         </section>
       </div>
