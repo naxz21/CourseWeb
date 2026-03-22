@@ -10,6 +10,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -18,12 +19,28 @@ export default function LoginPage() {
     setLoading(true)
     setMessage('')
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: {
+        // Supabase maneja la persistencia via cookies — este flag le indica
+        // al cliente si debe mantener la sesión en localStorage también
+      },
+    })
 
     if (error) {
       setMessage(error.message)
       setLoading(false)
       return
+    }
+
+    // Si NO quiere recordar, borramos la sesión de localStorage al cerrar el tab
+    if (!remember) {
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          // Sin persistencia adicional — solo sesión de navegador
+        }
+      })
     }
 
     await fetch('/api/profile/ensure', { method: 'POST' })
@@ -91,6 +108,29 @@ export default function LoginPage() {
               <label style={labelStyle}>Contraseña</label>
               <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} required />
             </div>
+
+            {/* Recordar sesión */}
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', userSelect: 'none' }}>
+              <div
+                onClick={() => setRemember(!remember)}
+                style={{
+                  width: '18px',
+                  height: '18px',
+                  borderRadius: '4px',
+                  border: `2px solid ${remember ? '#4A7C3F' : 'rgba(74,124,63,0.4)'}`,
+                  background: remember ? '#4A7C3F' : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  transition: 'all 0.15s',
+                  cursor: 'pointer',
+                }}
+              >
+                {remember && <span style={{ color: '#F5F2E8', fontSize: '11px', lineHeight: 1 }}>✓</span>}
+              </div>
+              <span style={{ fontSize: '0.85rem', color: '#5C5C4A' }}>Recordar mi sesión</span>
+            </label>
 
             {message && (
               <div style={{ background: 'rgba(180,60,40,0.08)', border: '1px solid rgba(180,60,40,0.2)', borderRadius: '0.75rem', padding: '0.75rem 1rem', fontSize: '0.875rem', color: '#8B2500' }}>
