@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import BuyButton from '@/components/BuyButton'
+import RedeemCodeButton from '@/components/RedeemCodeButton'
 
 export default async function CoursePage({
   params,
@@ -17,13 +18,11 @@ export default async function CoursePage({
   if (courseError || !course) return <main style={{ minHeight: '100vh', background: '#F5F2E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', color: '#2D5A27' }}>Curso no encontrado</main>
 
   const { data: enrollment } = await supabase.from('enrollments').select('*').eq('user_id', user.id).eq('course_id', course.id).eq('status', 'active').maybeSingle()
-
   const { data: modules } = await supabase.from('modules').select(`id, title, description, position, lessons ( id, title, content, position, cover_image_url )`).eq('course_id', course.id).order('position', { ascending: true })
 
   const hasAccess = !!enrollment
 
   let progressMap = new Map<string, { lesson_id: string; completed: boolean; last_viewed_at: string | null }>()
-
   if (hasAccess) {
     const { data: progressRows } = await supabase.from('lesson_progress').select('lesson_id, completed, last_viewed_at').eq('user_id', user.id).eq('course_id', course.id)
     progressMap = new Map((progressRows || []).map((item: any) => [item.lesson_id, item]))
@@ -50,13 +49,10 @@ export default async function CoursePage({
     flatLessons.find((l: any) => !progressMap.get(l.id)?.completed) ||
     flatLessons[0]
 
-  const searchLessons = flatLessons.map((lesson: any) => ({ id: lesson.id, title: lesson.title, moduleTitle: lesson.moduleTitle, slug, locked: hasAccess ? !unlockedLessonIds.has(lesson.id) : true, completed: !!progressMap.get(lesson.id)?.completed }))
-
   return (
     <main style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F5F2E8 0%, #EDE8D5 100%)', fontFamily: 'Georgia, serif' }}>
       <style>{`.lesson-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,124,63,0.1); }`}</style>
 
-      {/* Header */}
       <header style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(74,124,63,0.15)', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4A7C3F' }}>El Arte de Fermentar</span>
         <Link href="/dashboard" style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', border: '1.5px solid #4A7C3F', color: '#4A7C3F', fontSize: '0.875rem', textDecoration: 'none' }}>← Dashboard</Link>
@@ -87,9 +83,12 @@ export default async function CoursePage({
                   </div>
                 )}
               </div>
+
+              {/* Botones de acceso cuando no tiene el curso */}
               {!hasAccess && (
-                <div style={{ flexShrink: 0 }}>
+                <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
                   <BuyButton courseId={course.id} title={course.title} price={course.price} userEmail={user.email ?? ''} userId={user.id} />
+                  <RedeemCodeButton courseId={course.id} />
                 </div>
               )}
             </div>
@@ -110,13 +109,11 @@ export default async function CoursePage({
           </section>
         )}
 
-        {/* Búsqueda */}
-
         {/* Acceso bloqueado */}
         {!hasAccess && (
           <section style={{ background: 'rgba(139,105,20,0.06)', border: '1px solid rgba(139,105,20,0.2)', borderRadius: '1.25rem', padding: '1.5rem' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: '400', color: '#8B6914', marginBottom: '0.5rem' }}>Acceso bloqueado</h2>
-            <p style={{ color: '#5C5C4A', fontSize: '0.9rem' }}>Tenés que comprar el curso para ver las lecciones.</p>
+            <p style={{ color: '#5C5C4A', fontSize: '0.9rem' }}>Comprá el curso o ingresá un código de acceso para ver las lecciones.</p>
           </section>
         )}
 

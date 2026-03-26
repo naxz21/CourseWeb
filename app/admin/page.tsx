@@ -9,8 +9,9 @@ export default async function AdminPanelPage() {
 
   const sections = [
     { href: '/admin/cursos', label: 'Cursos', desc: 'Crear, editar y eliminar cursos.', icon: '📚' },
-    { href: '/admin/modulos', label: 'Módulos', desc: 'Organizar módulos por curso.', icon: '🗂️' },
-    { href: '/admin/lecciones', label: 'Lecciones', desc: 'Crear y ordenar lecciones.', icon: '📝' },
+    { href: '/admin/modulos', label: 'Módulos', desc: 'Organizar módulos y lecciones.', icon: '🗂️' },
+    { href: '/admin/lecciones', label: 'Lecciones', desc: 'Ver y editar lecciones.', icon: '📝' },
+    { href: '/admin/codigos', label: 'Códigos de acceso', desc: 'Crear códigos para desbloquear cursos.', icon: '🔑' },
     { href: '/admin/profiles', label: 'Perfiles', desc: 'Ver todos los perfiles registrados.', icon: '👥' },
   ]
 
@@ -29,15 +30,9 @@ export default async function AdminPanelPage() {
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '3rem 1.5rem' }}>
         <div style={{ marginBottom: '3rem' }}>
-          <p style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.5rem' }}>
-            Administración
-          </p>
-          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: '400', color: '#2D5A27' }}>
-            Panel admin
-          </h1>
-          <p style={{ color: '#5C5C4A', marginTop: '0.5rem' }}>
-            Administrá cursos, módulos, lecciones y perfiles.
-          </p>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.5rem' }}>Administración</p>
+          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: '400', color: '#2D5A27' }}>Panel admin</h1>
+          <p style={{ color: '#5C5C4A', marginTop: '0.5rem' }}>Administrá cursos, módulos, lecciones y perfiles.</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.5rem' }}>
@@ -49,8 +44,8 @@ export default async function AdminPanelPage() {
               style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '1.25rem', padding: '2rem 1.5rem', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s', display: 'block' }}
             >
               <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>{s.icon}</div>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: '400', color: '#2D5A27', marginBottom: '0.5rem' }}>{s.label}</h2>
-              <p style={{ fontSize: '0.875rem', color: '#5C5C4A', lineHeight: '1.5' }}>{s.desc}</p>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: '400', color: '#2D5A27', marginBottom: '0.5rem' }}>{s.label}</h2>
+              <p style={{ fontSize: '0.875rem', color: '#5C5C4A', lineHeight: '1.5', margin: 0 }}>{s.desc}</p>
             </Link>
           ))}
         </div>
