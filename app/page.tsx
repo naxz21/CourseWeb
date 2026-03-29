@@ -13,7 +13,7 @@ export default function HomePage() {
     'Elaborar kombucha',
     'Preparar chucrut',
     'Hacer vegetales fermentados',
-    'Aprender kimchi',
+    'Aprender a hacer kimchi',
     'Elaborar kéfir de agua y de leche',
   ]
 
@@ -23,8 +23,10 @@ export default function HomePage() {
     'Recetas paso a paso',
     'Material complementario',
     'Acompañamiento directo de la docente',
-    'Respuesta a consultas en 24–48 hs',
+    'Respuesta a consultas en 24–48 hs', 
+    'Encuentros sincronicos de consulta cada 15 dias',
   ]
+
 
   const faqs = [
     {
@@ -381,8 +383,7 @@ export default function HomePage() {
                   margin: '0 0 1rem 0',
                 }}
               >
-                Curso completo para aprender a fermentar con base científica, de forma
-                simple y segura.
+                Curso completo para aprender a fermentar con base científica.
               </p>
 
               <p
@@ -522,7 +523,7 @@ export default function HomePage() {
                   color: '#2D5A27',
                 }}
               >
-                $ 34.800
+                $ 44.800
               </h2>
 
               <ul className="check-list" style={{ marginBottom: '1.4rem' }}>
@@ -763,7 +764,7 @@ export default function HomePage() {
                   color: '#2D5A27',
                 }}
               >
-                $ 34.800
+                $ 44.800
               </h3>
               <p style={{ margin: '0.45rem 0 0 0', color: '#5E6357' }}>
                 Pago único · Acceso para siempre · Pesos argentinos
