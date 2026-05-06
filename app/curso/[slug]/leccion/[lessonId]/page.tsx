@@ -103,7 +103,6 @@ export default async function LessonPage({
   const completedLessons = orderedLessons.filter((item) => progressMap.get(item.id)?.completed).length
   const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
 
-  // ← CAMBIO: traer provider y provider_file_id
   const { data: assets } = await supabaseAdmin
     .from('lesson_assets')
     .select('id, asset_type, title, file_url, position, provider, provider_file_id')
@@ -111,9 +110,9 @@ export default async function LessonPage({
     .order('position', { ascending: true })
 
   const safeAssets = assets || []
-  const pdfs    = safeAssets.filter((a: any) => a.asset_type === 'pdf')
-  const videos  = safeAssets.filter((a: any) => a.asset_type === 'video')
-  const images  = safeAssets.filter((a: any) => a.asset_type === 'image')
+  const pdfs   = safeAssets.filter((a: any) => a.asset_type === 'pdf')
+  const videos = safeAssets.filter((a: any) => a.asset_type === 'video')
+  const images = safeAssets.filter((a: any) => a.asset_type === 'image')
 
   return (
     <main style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F5F2E8 0%, #EDE8D5 100%)', fontFamily: 'Georgia, serif' }}>
@@ -150,34 +149,103 @@ export default async function LessonPage({
           </div>
         </section>
 
-        {/* Videos — sin cambios */}
+        {/* ── VIDEOS ── bifurcación Mux vs legacy ── */}
         {videos.length > 0 && (
           <section style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: '400', color: '#2D5A27' }}>Videos</h2>
-            {videos.map((v: any) => (
-              <div key={v.id} style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '1.25rem', padding: '1.25rem', boxShadow: '0 2px 12px rgba(74,124,63,0.04)' }}>
-                <p style={{ fontSize: '0.875rem', color: '#2D5A27', marginBottom: '0.75rem' }}>{v.title || 'Video'}</p>
-                <video controls style={{ width: '100%', borderRadius: '0.75rem' }} src={v.file_url} />
-              </div>
-            ))}
+            {videos.map((v: any) => {
+              const isMux = v.provider === 'mux'
+
+              // ── Video Mux (streaming HLS) ──────────────────────────────────
+              if (isMux) {
+                // file_url guarda el playback_id cuando provider = 'mux'
+                const playbackId = v.file_url || v.provider_file_id
+
+                if (!playbackId) {
+                  return (
+                    <div key={v.id} style={cardStyle}>
+                      <p style={{ fontSize: '0.875rem', color: '#8B2500' }}>
+                        ⚠ Este video todavía está procesándose o tiene un error.
+                      </p>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div key={v.id} style={cardStyle}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <p style={{ fontSize: '0.875rem', color: '#2D5A27', margin: 0 }}>{v.title || 'Video'}</p>
+                      <span style={{ fontSize: '0.7rem', color: '#4A7C3F', background: 'rgba(74,124,63,0.1)', padding: '0.2rem 0.6rem', borderRadius: '999px', whiteSpace: 'nowrap' }}>
+                        ▶ Mux Stream
+                      </span>
+                    </div>
+
+                    {/*
+                      Usamos un iframe de Mux como player universal.
+                      No requiere instalar @mux/mux-player-react y funciona en Server Components.
+                      Si preferís el player React, instalá el paquete y reemplazá esto.
+                    */}
+                    <div style={{ position: 'relative', paddingTop: '56.25%', borderRadius: '0.75rem', overflow: 'hidden', background: '#000' }}>
+                      <iframe
+                        src={`https://stream.mux.com/${playbackId}.m3u8`}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                        title={v.title || 'Video'}
+                      />
+                    </div>
+
+                    {/*
+                      ALTERNATIVA con Mux Player React (mejor experiencia):
+                      
+                      1. npm install @mux/mux-player-react
+                      2. Creá un Client Component wrapper (ej: components/MuxPlayer.tsx):
+                      
+                          'use client'
+                          import MuxPlayer from '@mux/mux-player-react'
+                          export default function MuxPlayerWrapper({ playbackId, title }: { playbackId: string, title?: string }) {
+                            return (
+                              <MuxPlayer
+                                playbackId={playbackId}
+                                streamType="on-demand"
+                                accentColor="#4A7C3F"
+                                metadata={{ video_title: title }}
+                                style={{ width: '100%', borderRadius: '0.75rem' }}
+                              />
+                            )
+                          }
+                      
+                      3. Reemplazá el iframe de arriba con:
+                          <MuxPlayerWrapper playbackId={playbackId} title={v.title} />
+                    */}
+                  </div>
+                )
+              }
+
+              // ── Video legacy (archivo directo) ─────────────────────────────
+              return (
+                <div key={v.id} style={cardStyle}>
+                  <p style={{ fontSize: '0.875rem', color: '#2D5A27', marginBottom: '0.75rem' }}>{v.title || 'Video'}</p>
+                  <video controls style={{ width: '100%', borderRadius: '0.75rem' }} src={v.file_url} />
+                </div>
+              )
+            })}
           </section>
         )}
 
-        {/* PDFs ← CAMBIO: bifurcación local vs gdrive */}
+        {/* PDFs — sin cambios */}
         {pdfs.length > 0 && (
           <section style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: '400', color: '#2D5A27' }}>PDFs</h2>
             {pdfs.map((p: any) => {
               const isGdrive = p.provider === 'gdrive'
 
-              // PDF de Google Drive
               if (isGdrive) {
                 const hasFileId = !!p.provider_file_id
                 const previewUrl = hasFileId ? buildGDrivePreviewUrl(p.provider_file_id) : null
 
                 return (
-                  <div key={p.id} style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '1.25rem', padding: '1.25rem', boxShadow: '0 2px 12px rgba(74,124,63,0.04)' }}>
-                    {/* Header con badge */}
+                  <div key={p.id} style={cardStyle}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
                       <p style={{ fontSize: '0.875rem', color: '#2D5A27', margin: 0 }}>{p.title || 'PDF'}</p>
                       <span style={{ fontSize: '0.7rem', color: '#1A56A4', background: 'rgba(26,86,164,0.1)', padding: '0.2rem 0.6rem', borderRadius: '999px', whiteSpace: 'nowrap' }}>
@@ -187,49 +255,31 @@ export default async function LessonPage({
 
                     {hasFileId && previewUrl ? (
                       <>
-                        {/* Botón para abrir en nueva pestaña */}
-                       <div style={{ marginBottom: '1rem' }}>
-  <a
-    href={`https://drive.google.com/file/d/${p.provider_file_id}/view`}
-    target="_blank"
-    rel="noopener noreferrer"
-    style={{
-      padding: '0.5rem 1.25rem',
-      borderRadius: '999px',
-      background: '#4A7C3F',
-      color: '#F5F2E8',
-      fontSize: '0.875rem',
-      textDecoration: 'none',
-      display: 'inline-block'
-    }}
-  >
-    Abrir en Google Drive ↗
-  </a>
-</div>
-
-                        {/* Visor embebido */}
+                        <div style={{ marginBottom: '1rem' }}>
+                          <a
+                            href={`https://drive.google.com/file/d/${p.provider_file_id}/view`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block' }}
+                          >
+                            Abrir en Google Drive ↗
+                          </a>
+                        </div>
                         <div style={{ borderRadius: '0.75rem', overflow: 'hidden', border: '1px solid rgba(74,124,63,0.15)', background: 'rgba(245,242,232,0.5)' }}>
-                          <iframe
-                            src={previewUrl}
-                            title={p.title || 'PDF'}
-                            style={{ width: '100%', height: '780px', border: 'none', display: 'block' }}
-                            allow="autoplay"
-                          />
+                          <iframe src={previewUrl} title={p.title || 'PDF'} style={{ width: '100%', height: '780px', border: 'none', display: 'block' }} allow="autoplay" />
                         </div>
                       </>
                     ) : (
-                      // Error: no hay file ID guardado
                       <div style={{ background: 'rgba(180,60,40,0.06)', border: '1px solid rgba(180,60,40,0.15)', borderRadius: '0.75rem', padding: '1rem', fontSize: '0.875rem', color: '#8B2500' }}>
-                        No se pudo cargar el PDF. El archivo puede no estar disponible.
+                        No se pudo cargar el PDF.
                       </div>
                     )}
                   </div>
                 )
               }
 
-              // PDF local — comportamiento original
               return (
-                <div key={p.id} style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '1.25rem', padding: '1.25rem', boxShadow: '0 2px 12px rgba(74,124,63,0.04)' }}>
+                <div key={p.id} style={cardStyle}>
                   <p style={{ fontSize: '0.875rem', color: '#2D5A27', marginBottom: '0.75rem' }}>{p.title || 'PDF'}</p>
                   <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
                     <a href={p.file_url} target="_blank" rel="noopener noreferrer" style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', fontSize: '0.875rem', textDecoration: 'none' }}>
@@ -269,7 +319,6 @@ export default async function LessonPage({
           </section>
         )}
 
-        {/* Marcar completada */}
         <LessonProgressControls
           courseId={course.id}
           moduleId={lesson.module_id}
@@ -277,7 +326,6 @@ export default async function LessonPage({
           initialCompleted={isCompleted}
         />
 
-        {/* Navegación anterior/siguiente */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <div style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(74,124,63,0.15)', borderRadius: '1rem', padding: '1.25rem' }}>
             <p style={{ fontSize: '0.75rem', color: '#8B6914', marginBottom: '0.5rem' }}>Anterior</p>
@@ -300,4 +348,12 @@ export default async function LessonPage({
       </div>
     </main>
   )
+}
+
+const cardStyle: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(74,124,63,0.2)',
+  borderRadius: '1.25rem',
+  padding: '1.25rem',
+  boxShadow: '0 2px 12px rgba(74,124,63,0.04)',
 }
