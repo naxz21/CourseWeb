@@ -12,24 +12,15 @@ export default async function AdminLessonsPage() {
     .order('position', { ascending: true })
 
   return (
-    <main style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F5F2E8 0%, #EDE8D5 100%)', fontFamily: 'Georgia, serif' }}>
-      <header style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(74,124,63,0.15)', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4A7C3F' }}>Admin · Lecciones</span>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <Link href="/admin/modulos" style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', fontSize: '0.875rem', textDecoration: 'none' }}>+ Crear lección</Link>
-          <Link href="/admin" style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', border: '1.5px solid #4A7C3F', color: '#4A7C3F', fontSize: '0.875rem', textDecoration: 'none' }}>← Volver</Link>
-        </div>
-      </header>
-
-      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem 1.5rem' }}>
-        <div style={{ marginBottom: '2.5rem' }}>
-          <p style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.5rem' }}>Administración</p>
-          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: '400', color: '#2D5A27' }}>Lecciones</h1>
-          <p style={{ color: '#5C5C4A', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-            Para crear lecciones, usá la sección de{' '}
-            <Link href="/admin/modulos" style={{ color: '#4A7C3F' }}>Módulos</Link>.
-          </p>
-        </div>
+    <>
+      <div style={{ marginBottom: '2rem' }}>
+        <p style={{ fontSize: '0.72rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.5rem' }}>Administración</p>
+        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: '400', color: '#2D5A27' }}>Lecciones</h1>
+        <p style={{ color: '#5C5C4A', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+          Para crear lecciones, usá la sección de{' '}
+          <a href="/admin/modulos" style={{ color: '#4A7C3F' }}>Módulos</a>.
+        </p>
+      </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {lessons && lessons.length > 0 ? lessons.map((lesson: any) => (
@@ -63,7 +54,6 @@ export default async function AdminLessonsPage() {
             </div>
           )}
         </div>
-      </div>
-    </main>
+    </>
   )
 }

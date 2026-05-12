@@ -66,21 +66,11 @@ export default async function AdminProfilesPage({
   }
 
   return (
-    <main className="mx-auto max-w-7xl p-6">
-      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Perfiles registrados</h1>
-          <p className="mt-1 text-sm text-gray-400">
-            Administrá y visualizá todos los usuarios registrados.
-          </p>
-        </div>
-
-        <Link
-          href="/admin"
-          className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
-        >
-          ← Volver al panel admin
-        </Link>
+    <>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <p style={{ fontSize: '0.72rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.5rem' }}>Administración</p>
+        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: '400', color: '#2D5A27' }}>Perfiles registrados</h1>
+        <p style={{ color: '#5C5C4A', fontSize: '0.9rem', marginTop: '0.4rem' }}>Administrá y visualizá todos los usuarios registrados.</p>
       </div>
 
       <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-4 shadow-sm">
@@ -208,6 +198,6 @@ export default async function AdminProfilesPage({
           </div>
         </>
       )}
-    </main>
+    </>
   )
 }
