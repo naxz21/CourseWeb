@@ -19,7 +19,7 @@ export default function HomePage() {
     'Curso 100% online',
     'Clases en video + material escrito paso a paso',
     'Acceso inmediato',
-    'Acceso para siempre',
+    'Acceso durante un año',
     'Acompañamiento directo de la docente',
   ]
 
@@ -34,18 +34,17 @@ export default function HomePage() {
   ]
 
   const offerItems = [
-    '3 horas de contenido en video',
+    'Más de 5 horas de contenido en video',
     'Más de 20 lecciones',
     'Recetas paso a paso',
     'Material complementario',
     'Acompañamiento directo de la docente',
     'Respuesta a consultas en 24–48 hs',
-    'Encuentros sincrónicos de consulta cada 15 días',
   ]
 
   const faqs = [
     { q: '¿Es un pago único?', a: 'Sí, realizás un solo pago sin cargos adicionales.' },
-    { q: '¿Por cuánto tiempo tengo acceso?', a: 'El acceso es para siempre, incluyendo actualizaciones y soporte.' },
+    { q: '¿Por cuánto tiempo tengo acceso?', a: 'El acceso es durante un año, incluyendo actualizaciones y soporte.' },
     { q: '¿Es seguro fermentar en casa?', a: 'Sí. La fermentación es una técnica ancestral segura si se aplican correctamente las recomendaciones brindadas. En este curso aprenderás paso a paso a elaborar tus propios alimentos fermentados e incorporar la fermentación a tu vida cotidiana.' },
     { q: '¿Qué pasa si no tengo tiempo ahora?', a: 'El curso es asincrónico, para que puedas organizar tus tiempos y avanzar a tu propio ritmo.' },
     { q: '¿Puedo acceder desde el celular o tablet?', a: 'Sí, desde celular, tablet o computadora con conexión a internet.' },
@@ -57,6 +56,7 @@ export default function HomePage() {
   const [chatHistory, setChatHistory] = useState<{ q: string; a: string }[]>([])
   const [askedSet, setAskedSet] = useState<Set<string>>(new Set())
   const [scrollY, setScrollY] = useState(0)
+  const [showBio, setShowBio] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY)
@@ -74,9 +74,9 @@ export default function HomePage() {
   const includesSection = useInView()
   const howSection = useInView()
   const programaSection = useInView()
-  const ofertaSection = useInView()
   const faqSection = useInView()
-  const ctaSection = useInView()
+  const instructorSection = useInView()
+  const precioSection = useInView()
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F4EC', fontFamily: "'Georgia', 'Times New Roman', serif", color: '#2E3A2C', overflowX: 'hidden' }}>
@@ -413,27 +413,27 @@ export default function HomePage() {
           <div className="grid-2" style={{ alignItems: 'center', gap: '3rem' }}>
             <div ref={hero.ref}>
               <div className={`fade-up ${hero.inView ? 'visible' : ''}`}>
-                <span className="eyebrow">Curso de alimentos fermentados</span>
+                <span className="eyebrow">🌿 Curso de Alimentos Fermentados</span>
               </div>
               <h1 className={`pf fade-up ${hero.inView ? 'visible' : ''} fade-up-d1`} style={{
                 fontSize: 'clamp(2.8rem, 6vw, 5rem)',
                 lineHeight: 1.06, fontWeight: 400, color: '#1E3D1A',
                 margin: '0 0 1.4rem 0',
               }}>
-                Aprendé el arte de fermentar<em style={{ fontStyle: 'italic', color: '#8B6914' }}> en casa</em>
+                Aprende el arte de fermentar<em style={{ fontStyle: 'italic', color: '#8B6914' }}> en casa</em>
               </h1>
               <p className={`dm fade-up ${hero.inView ? 'visible' : ''} fade-up-d2`} style={{ fontSize: '1.08rem', color: '#5A6050', maxWidth: '560px', lineHeight: 1.85, margin: '0 0 0.75rem 0', fontWeight: 300 }}>
-                Curso completo para aprender a fermentar con base científica.
+                Aprendé a fermentar en casa sin miedos, con base científica explicada de forma simple.
               </p>
               <p className={`dm fade-up ${hero.inView ? 'visible' : ''} fade-up-d3`} style={{ fontSize: '1rem', color: '#5A6050', maxWidth: '560px', lineHeight: 1.85, margin: '0 0 2rem 0', fontWeight: 300 }}>
-                Técnicas simples y seguras, explicadas paso a paso con ingredientes fáciles de conseguir. Desde la primera semana podrás hacer tus propios fermentos en casa.
+                Técnicas simples y seguras, explicadas paso a paso con ingredientes fáciles de conseguir. En este curso vas a poder hacer tus propios fermentos en casa desde el primer día.
               </p>
               <div className={`fade-up ${hero.inView ? 'visible' : ''} fade-up-d4`} style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-                <a href="/register" className="btn-primary" style={{ padding: '0.9rem 1.7rem', fontSize: '0.97rem' }}>Ver oferta especial</a>
+                <a href="/register" className="btn-primary" style={{ padding: '0.9rem 1.7rem', fontSize: '0.97rem' }}>👉 Ver oferta especial</a>
                 <a href="#programa" className="btn-secondary" style={{ padding: '0.9rem 1.7rem', fontSize: '0.97rem' }}>Ver programa</a>
               </div>
               <div className={`fade-up ${hero.inView ? 'visible' : ''} fade-up-d5`} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-                {['100% online', 'Acceso inmediato', 'A tu ritmo', 'Acceso para siempre'].map(b => (
+                {['100% online', 'Acceso inmediato', 'A tu ritmo', 'Acceso por un año'].map(b => (
                   <span key={b} className="badge dm">{b}</span>
                 ))}
               </div>
@@ -455,46 +455,46 @@ export default function HomePage() {
 
       <hr className="divider" />
 
-      {/* INCLUDES + PRICE */}
+      {/* INCLUDES + OFFER */}
       <section className="section" ref={includesSection.ref}>
         <div className="container">
-          <div className="grid-2" style={{ gap: '1.5rem', alignItems: 'stretch' }}>
+          <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+
+            {/* Card unificada: Incluye + Ofrecemos */}
             <div className={`card-elevated fade-up ${includesSection.inView ? 'visible' : ''}`} style={{ padding: '2.5rem' }}>
               <span className="eyebrow">¿Qué incluye el curso?</span>
-              <h2 className="pf" style={{ margin: '0 0 1.5rem 0', fontSize: '2rem', lineHeight: 1.2, fontWeight: 400, color: '#1E3D1A' }}>
-                Todo lo necesario para empezar con seguridad
+              <h2 className="pf" style={{ margin: '0 0 1.75rem 0', fontSize: '1.85rem', lineHeight: 1.2, fontWeight: 400, color: '#1E3D1A' }}>
+                En este curso aprenderás a fermentar desde cero, con una sólida base científica
               </h2>
-              <ul className="check-list">
-                {includes.map(item => <li key={item}>{item}</li>)}
-              </ul>
+
+              {/* Dos columnas de items */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem 2rem' }}>
+                {/* Columna 1: includes */}
+                <div>
+                  <p className="dm" style={{ margin: '0 0 0.75rem 0', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#8B6914', fontWeight: 500 }}>Modalidad</p>
+                  <ul className="check-list">
+                    {includes.map(item => <li key={item}>{item}</li>)}
+                  </ul>
+                </div>
+                {/* Columna 2: offerItems */}
+                <div>
+                  <p className="dm" style={{ margin: '0 0 0.75rem 0', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#8B6914', fontWeight: 500 }}>Contenido</p>
+                  <ul className="check-list">
+                    {offerItems.map(item => <li key={item}>{item}</li>)}
+                  </ul>
+                </div>
+              </div>
+
               <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <a href="/register" className="btn-primary" style={{ padding: '0.9rem 1.6rem', fontSize: '0.96rem', alignSelf: 'flex-start' }}>
-                  Ver oferta especial
+                <a href="#precio" className="btn-primary" style={{ padding: '0.9rem 1.6rem', fontSize: '0.96rem', alignSelf: 'flex-start' }}>
+                  👉 Ver oferta especial
                 </a>
                 <p className="dm" style={{ margin: 0, color: '#7A8070', fontSize: '0.88rem', fontWeight: 300 }}>
-                  🔒 Pago 100% seguro. Tus datos están protegidos.
+                  🔒 Pago 100% seguro. Tus datos están protegidos en todo momento.
                 </p>
               </div>
             </div>
 
-            <div className={`card fade-up ${includesSection.inView ? 'visible' : ''} fade-up-d2`} style={{ padding: '2.5rem', background: 'linear-gradient(145deg, rgba(45,90,39,0.04), rgba(255,255,255,0.82))' }}>
-              <span className="eyebrow">Precio promocional</span>
-              <p className="dm" style={{ margin: '0 0 0.5rem 0', color: '#7A8070', fontWeight: 300, fontSize: '0.95rem' }}>Hasta el 10 de mayo</p>
-              <h2 className="pf" style={{ margin: '0 0 0.3rem 0', fontSize: '3.8rem', lineHeight: 1, fontWeight: 400, color: '#1E3D1A' }}>
-                $44.800
-              </h2>
-              <p className="dm" style={{ margin: '0 0 1.8rem 0', color: '#8B6914', fontSize: '0.78rem', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500 }}>
-                Pesos argentinos
-              </p>
-              <ul className="check-list" style={{ marginBottom: '2rem' }}>
-                <li>Pago único, sin cargos adicionales</li>
-                <li>Acceso de por vida al curso</li>
-                <li>Incluye actualizaciones futuras</li>
-              </ul>
-              <a href="/register" className="btn-primary" style={{ padding: '0.95rem 1.8rem', fontSize: '0.98rem' }}>
-                Inscribirme ahora →
-              </a>
-            </div>
           </div>
         </div>
       </section>
@@ -513,16 +513,39 @@ export default function HomePage() {
           </div>
           <div className="grid-4">
             {[
-              { n: '01', title: 'Inscribite', text: 'Completá tus datos, realizá el pago y accedé inmediatamente.' },
-              { n: '02', title: 'Aprendé', text: 'Modalidad 100% online y asincrónica, con videos y materiales.' },
-              { n: '03', title: 'Organizate', text: 'Módulos y lecciones. Avanzá a tu propio ritmo sin presiones.' },
-              { n: '04', title: 'Disfrutá', text: 'Acceso ilimitado para siempre. Tus fermentos, tu tiempo.' },
+              {
+                n: '01',
+                icon: '🛒',
+                title: 'Elegí tu plan e inscribite',
+                text: 'Hacé click en "Inscribirme ahora", completá tus datos personales y realizá el pago de forma segura. Todo en menos de 2 minutos.',
+              },
+              {
+                n: '02',
+                icon: '📧',
+                title: 'Confirmá tu cuenta',
+                text: 'Te llegará un email de confirmación. Hacé click en el enlace para activar tu cuenta y luego iniciá sesión en la plataforma.',
+              },
+              {
+                n: '03',
+                icon: '🎓',
+                title: 'Accedé al curso',
+                text: 'Ingresá a tu panel de alumno en "Mi dashboard". Allí vas a encontrar todos los módulos y lecciones disponibles para comenzar.',
+              },
+              {
+                n: '04',
+                icon: '🌿',
+                title: 'Aprendé a tu ritmo',
+                text: 'Navegá los módulos en orden o a tu criterio. Mirá los videos, descargá el material y consultale a la docente cuando lo necesites.',
+              },
             ].map((step, i) => (
               <div key={step.n} className={`card step-card fade-up ${howSection.inView ? 'visible' : ''} fade-up-d${i + 1}`}
                 style={{ padding: '1.8rem', textAlign: 'left' }}>
-                <div className="number dm">{step.n}</div>
-                <h3 className="pf" style={{ margin: '0 0 0.6rem 0', fontSize: '1.25rem', fontWeight: 400, color: '#1E3D1A' }}>{step.title}</h3>
-                <p className="dm" style={{ margin: 0, color: '#5D6357', lineHeight: 1.75, fontWeight: 300, fontSize: '0.95rem' }}>{step.text}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.1rem' }}>
+                  <div className="number dm">{step.n}</div>
+                  <span style={{ fontSize: '1.3rem' }}>{step.icon}</span>
+                </div>
+                <h3 className="pf" style={{ margin: '0 0 0.6rem 0', fontSize: '1.15rem', fontWeight: 400, color: '#1E3D1A' }}>{step.title}</h3>
+                <p className="dm" style={{ margin: 0, color: '#5D6357', lineHeight: 1.75, fontWeight: 300, fontSize: '0.9rem' }}>{step.text}</p>
               </div>
             ))}
           </div>
@@ -534,45 +557,122 @@ export default function HomePage() {
       {/* WHAT YOU'LL LEARN */}
       <section className="section" id="programa" ref={programaSection.ref}>
         <div className="container">
-          <div className={`fade-up ${programaSection.inView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div className={`fade-up ${programaSection.inView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <span className="eyebrow">¿Qué aprenderás?</span>
             <h2 className="section-title">Fermentación explicada de forma simple y práctica</h2>
             <p className="section-text dm" style={{ margin: '0 auto' }}>
               Fundamentos, seguridad y preparaciones concretas para empezar desde cero con confianza.
             </p>
           </div>
-          <div className="grid-2" style={{ alignItems: 'center', gap: '2.5rem' }}>
-            <div className={`img-wrap scale-in ${programaSection.inView ? 'visible' : ''}`} style={{ borderRadius: '24px', minHeight: '480px', overflow: 'hidden', boxShadow: '0 12px 48px rgba(30,61,26,0.10)' }}>
-              <img
-                src="/fermentacionexplicadadeformasimple.png"
-                alt="Preparaciones fermentadas del curso"
-                style={{ width: '100%', minHeight: '480px', objectFit: 'cover', display: 'block' }}
-              />
-            </div>
-            <div className={`card-elevated fade-up ${programaSection.inView ? 'visible' : ''} fade-up-d2`} style={{ padding: '2.5rem' }}>
-              <ul className="check-list">
-                {learnItems.map(item => <li key={item}>{item}</li>)}
-              </ul>
+          <div className={`card-elevated fade-up ${programaSection.inView ? 'visible' : ''} fade-up-d2`}
+            style={{ maxWidth: '760px', margin: '0 auto', padding: '2.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 2rem' }}>
+              {learnItems.map(item => (
+                <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <span style={{ color: '#2D5A27', fontWeight: 500, flexShrink: 0, marginTop: '0.1em' }}>✓</span>
+                  <span className="dm" style={{ color: '#4A5244', fontSize: '0.97rem', lineHeight: 1.7, fontWeight: 300 }}>{item}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
+
       <hr className="divider" />
 
-      {/* OFFER */}
-      <section className="section" ref={ofertaSection.ref}>
+      {/* INSTRUCTOR */}
+      <section className="section" ref={instructorSection.ref}>
         <div className="container">
-          <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-            <div className={`card fade-up ${ofertaSection.inView ? 'visible' : ''}`} style={{ padding: '2.5rem' }}>
-              <span className="eyebrow">¿Qué te ofrecemos?</span>
-              <h2 className="pf" style={{ margin: '0 0 1.5rem 0', fontSize: '2rem', lineHeight: 1.2, fontWeight: 400, color: '#1E3D1A' }}>
-                Una experiencia completa y acompañada
-              </h2>
-              <ul className="check-list">
-                {offerItems.map(item => <li key={item}>{item}</li>)}
-              </ul>
+          <div className={`fade-up ${instructorSection.inView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <span className="eyebrow">👩‍🏫 ¿Quién imparte el curso?</span>
+            <h2 className="section-title">Conocé a tu docente</h2>
+          </div>
+          <div className={`card fade-up ${instructorSection.inView ? 'visible' : ''} fade-up-d2`}
+            style={{ padding: '1.75rem', maxWidth: '720px', margin: '0 auto' }}>
+
+            {/* Fila clickeable: foto + nombre + toggle */}
+            <button
+              onClick={() => setShowBio(!showBio)}
+              style={{
+                width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: '1.2rem',
+                padding: '0.25rem 0', textAlign: 'left',
+              }}
+            >
+              {/* Foto mini */}
+              <div style={{
+                width: '56px', height: '56px', borderRadius: '50%', flexShrink: 0,
+                overflow: 'hidden', border: '2px solid rgba(74,124,63,0.22)',
+                background: 'linear-gradient(135deg, rgba(74,124,63,0.1), rgba(139,105,20,0.08))',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <img
+                  src="/lili.jpg"
+                  alt="Dra. Liliana M. Gerard"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    (e.currentTarget.parentElement as HTMLElement).innerHTML = '<span style="font-size:1.6rem">👩‍🔬</span>';
+                  }}
+                />
+              </div>
+              {/* Nombre + cargo */}
+              <div style={{ flex: 1 }}>
+                <p className="pf" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 400, color: '#1E3D1A' }}>
+                  Dra. Liliana M. Gerard
+                </p>
+                <p className="dm" style={{ margin: '0.15rem 0 0 0', color: '#8B6914', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 500 }}>
+                  Profesora Titular · UNER
+                </p>
+              </div>
+              {/* Chevron animado */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                viewBox="0 0 24 24" stroke="#4A7C3F" strokeWidth={2}
+                style={{ flexShrink: 0, transition: 'transform 0.3s ease', transform: showBio ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Bio expandible */}
+            <div style={{
+              overflow: 'hidden',
+              maxHeight: showBio ? '800px' : '0px',
+              opacity: showBio ? 1 : 0,
+              transition: 'max-height 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease',
+            }}>
+              <div style={{ paddingTop: '1.4rem', display: 'flex', gap: '1.8rem', alignItems: 'flex-start' }}>
+                {/* Foto grande */}
+                <div style={{
+                  width: '120px', height: '120px', borderRadius: '50%', flexShrink: 0,
+                  overflow: 'hidden', border: '3px solid rgba(74,124,63,0.2)',
+                  boxShadow: '0 6px 24px rgba(30,61,26,0.1)',
+                  background: 'linear-gradient(135deg, rgba(74,124,63,0.1), rgba(139,105,20,0.08))',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <img
+                    src="/lili.jpg"
+                    alt="Dra. Liliana M. Gerard"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                      (e.currentTarget.parentElement as HTMLElement).innerHTML = '<span style="font-size:2.5rem">👩‍🔬</span>';
+                    }}
+                  />
+                </div>
+                {/* Texto */}
+                <div className="dm" style={{ display: 'grid', gap: '0.8rem', color: '#4A5244', fontSize: '0.93rem', lineHeight: 1.8, fontWeight: 300 }}>
+                  <p style={{ margin: 0 }}>Profesora Titular de la cátedra Microbiología General de la carrera Ingeniería de Alimentos de la Facultad de Ciencias de la Alimentación de la UNER, donde además se desempeña como docente de posgrado en carreras de doctorado y especialización vinculadas a microbiología, metodología de la investigación y tecnología de alimentos.</p>
+                  <p style={{ margin: 0 }}>Dirige el Laboratorio de Microbiología y Biotecnología de Alimentos de la UNER, dedicado al análisis microbiológico de alimentos, aguas y ambientes, así como al desarrollo de investigaciones aplicadas en microbiología alimentaria y biotecnología.</p>
+                  <p style={{ margin: 0 }}>Cuenta con más de <strong style={{ color: '#2D5A27', fontWeight: 500 }}>25 años de experiencia</strong> en docencia universitaria, investigación y formación de recursos humanos, dirigiendo tesis doctorales, becarios e investigadores en el área de microbiología y fermentaciones alimentarias.</p>
+                  <p style={{ margin: 0 }}>Su trabajo científico se enfoca en: microbiología de alimentos, microorganismos de interés biotecnológico, fermentaciones, levaduras y bacterias lácticas, fermentaciones vínicas, inocuidad alimentaria y desarrollo de fermentos autóctonos.</p>
+                  <p style={{ margin: 0 }}>Desde <em style={{ fontStyle: 'italic', color: '#8B6914' }}>"El arte de fermentar en casa"</em>, combina su experiencia científica y académica con una propuesta práctica y accesible para acercar el mundo de los alimentos fermentados a personas interesadas en aprender a fermentar de manera segura, consciente y aplicada a la vida cotidiana.</p>
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -646,74 +746,35 @@ export default function HomePage() {
 
       <hr className="divider" />
 
-      {/* CTA FINAL */}
-      <section className="section" ref={ctaSection.ref} style={{ paddingBottom: '7rem' }}>
+      {/* PRECIO */}
+      <section id="precio" className="section" ref={precioSection.ref} style={{ scrollMarginTop: '80px' }}>
         <div className="container">
-          <div className={`fade-up ${ctaSection.inView ? 'visible' : ''}`} style={{
-            position: 'relative', overflow: 'hidden', borderRadius: '28px',
-            background: 'linear-gradient(135deg, #1A3517 0%, #2D5A27 55%, #3A6E32 100%)',
-            padding: '4.5rem 3rem', textAlign: 'center',
-            boxShadow: '0 24px 64px rgba(30,61,26,0.22)',
-          }}>
-            <img src="/fondo_difuminado.jpg" alt="" style={{
-              position: 'absolute', inset: 0, width: '100%', height: '100%',
-              objectFit: 'cover', opacity: 0.1, zIndex: 0, mixBlendMode: 'luminosity',
-            }} />
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <span className="dm" style={{
-                display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.3em',
-                textTransform: 'uppercase', color: 'rgba(247,244,236,0.55)', marginBottom: '1rem',
-              }}>
-                <span style={{ display: 'inline-block', width: 22, height: 1, background: 'rgba(247,244,236,0.45)' }} />
-                Último paso
-              </span>
-              <h2 className="pf" style={{
-                margin: '0 0 1rem 0',
-                fontSize: 'clamp(2rem, 4vw, 3.2rem)',
-                fontWeight: 400, color: '#F7F4EC', lineHeight: 1.1,
-              }}>
-                Inscribite y empezá a fermentar en casa con seguridad
-              </h2>
-              <p className="dm" style={{
-                margin: '0 auto 2.5rem auto', color: 'rgba(247,244,236,0.68)',
-                lineHeight: 1.85, maxWidth: '580px', fontWeight: 300,
-              }}>
-                Acceso inmediato, modalidad asincrónica y acompañamiento para que puedas avanzar a tu propio ritmo.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
-                <a href="/register" style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  padding: '0.95rem 1.8rem', fontSize: '0.98rem', borderRadius: '999px',
-                  background: '#F7F4EC', color: '#1E3D1A',
-                  fontFamily: 'DM Sans, sans-serif', fontWeight: 500,
-                  textDecoration: 'none', cursor: 'pointer',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                  boxShadow: '0 6px 20px rgba(0,0,0,0.14)',
-                }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)' }}
-                >
-                  Ver oferta especial
-                </a>
-                <a href="/login" style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  padding: '0.95rem 1.8rem', fontSize: '0.98rem', borderRadius: '999px',
-                  background: 'transparent', border: '1.5px solid rgba(247,244,236,0.38)',
-                  color: '#F7F4EC', fontFamily: 'DM Sans, sans-serif', fontWeight: 400,
-                  textDecoration: 'none', cursor: 'pointer',
-                  transition: 'border-color 0.2s ease',
-                }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(247,244,236,0.85)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(247,244,236,0.38)' }}
-                >
-                  Ya tengo cuenta
-                </a>
-              </div>
-            </div>
+          <div className={`fade-up ${precioSection.inView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <span className="eyebrow">Precio promocional hasta el 10 de junio</span>
+            <h2 className="section-title">Empezá hoy a un precio especial</h2>
+          </div>
+          <div className={`card fade-up ${precioSection.inView ? 'visible' : ''} fade-up-d2`}
+            style={{ maxWidth: '480px', margin: '0 auto', padding: '3rem', textAlign: 'center', background: 'linear-gradient(145deg, rgba(45,90,39,0.04), rgba(255,255,255,0.9))' }}>
+            <h2 className="pf" style={{ margin: '0 0 0.3rem 0', fontSize: '4.5rem', lineHeight: 1, fontWeight: 400, color: '#1E3D1A' }}>
+              $34.800
+            </h2>
+            <p className="dm" style={{ margin: '0 0 2rem 0', color: '#8B6914', fontSize: '0.8rem', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500 }}>
+              🇦🇷 Pesos argentinos
+            </p>
+            <ul className="check-list" style={{ marginBottom: '2rem', textAlign: 'left' }}>
+              <li>✔ Pago único, sin cargos adicionales</li>
+              <li>✔ Acceso por un año</li>
+            </ul>
+            <a href="/register" className="btn-primary" style={{ width: '100%', padding: '1rem 1.8rem', fontSize: '1rem', justifyContent: 'center' }}>
+              👉 Inscribirme ahora
+            </a>
+            <p className="dm" style={{ margin: '1rem 0 0 0', color: '#7A8070', fontSize: '0.85rem', fontWeight: 300 }}>
+              🔒 Pago 100% seguro. Tus datos están protegidos en todo momento.
+            </p>
           </div>
         </div>
       </section>
+
     </main>
   )
 }
