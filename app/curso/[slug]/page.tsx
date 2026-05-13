@@ -120,7 +120,7 @@ export default async function CoursePage({
         {/* Módulos y lecciones */}
         {hasAccess && safeModules.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            {safeModules.map((module: any) => {
+            {safeModules.map((module: any, moduleIndex: number) => {
               const moduleLessons = [...(module.lessons || [])].sort((a: any, b: any) => a.position - b.position)
               const moduleCompleted = moduleLessons.filter((l: any) => progressMap.get(l.id)?.completed).length
               const moduleProgress = moduleLessons.length > 0 ? Math.round((moduleCompleted / moduleLessons.length) * 100) : 0
@@ -130,7 +130,7 @@ export default async function CoursePage({
                 <section key={module.id} style={{ background: 'rgba(255,255,255,0.6)', border: `1px solid ${isModuleUnlocked ? 'rgba(74,124,63,0.2)' : 'rgba(74,124,63,0.1)'}`, borderRadius: '1.25rem', padding: '1.75rem', boxShadow: '0 2px 12px rgba(74,124,63,0.05)', opacity: isModuleUnlocked ? 1 : 0.7 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
                     <div>
-                      <p style={{ fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.25rem' }}>Módulo</p>
+                      <p style={{ fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.25rem' }}>Módulo {moduleIndex + 1}</p>
                       <h2 style={{ fontSize: '1.25rem', fontWeight: '400', color: '#2D5A27' }}>{module.title}</h2>
                       {module.description && <p style={{ fontSize: '0.875rem', color: '#5C5C4A', marginTop: '0.25rem' }}>{module.description}</p>}
                     </div>

@@ -429,7 +429,7 @@ export default function HomePage() {
                 Técnicas simples y seguras, explicadas paso a paso con ingredientes fáciles de conseguir. En este curso vas a poder hacer tus propios fermentos en casa desde el primer día.
               </p>
               <div className={`fade-up ${hero.inView ? 'visible' : ''} fade-up-d4`} style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-                <a href="/register" className="btn-primary" style={{ padding: '0.9rem 1.7rem', fontSize: '0.97rem' }}>👉 Ver oferta especial</a>
+                <a href="#precio" className="btn-primary" style={{ padding: '0.9rem 1.7rem', fontSize: '0.97rem' }}>👉 Ver oferta especial</a>
                 <a href="#programa" className="btn-secondary" style={{ padding: '0.9rem 1.7rem', fontSize: '0.97rem' }}>Ver programa</a>
               </div>
               <div className={`fade-up ${hero.inView ? 'visible' : ''} fade-up-d5`} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>

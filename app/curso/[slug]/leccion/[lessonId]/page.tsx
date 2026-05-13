@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import LessonProgressControls from '@/components/LessonProgressControls'
 import { buildGDrivePreviewUrl } from '@/lib/gdrive'
+import MuxPlayerWrapper from '@/components/MuxPlayerWrapper'
 
 export default async function LessonPage({
   params,
@@ -110,7 +111,7 @@ export default async function LessonPage({
     .order('position', { ascending: true })
 
   const safeAssets = assets || []
-  const pdfs   = safeAssets.filter((a: any) => a.asset_type === 'pdf')
+  const pdfs = safeAssets.filter((a: any) => a.asset_type === 'pdf')
   const videos = safeAssets.filter((a: any) => a.asset_type === 'video')
   const images = safeAssets.filter((a: any) => a.asset_type === 'image')
 
@@ -180,44 +181,8 @@ export default async function LessonPage({
                       </span>
                     </div>
 
-                    {/*
-                      Usamos un iframe de Mux como player universal.
-                      No requiere instalar @mux/mux-player-react y funciona en Server Components.
-                      Si preferís el player React, instalá el paquete y reemplazá esto.
-                    */}
-                    <div style={{ position: 'relative', paddingTop: '56.25%', borderRadius: '0.75rem', overflow: 'hidden', background: '#000' }}>
-                      <iframe
-                        src={`https://stream.mux.com/${playbackId}.m3u8`}
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-                        allow="autoplay; fullscreen; picture-in-picture"
-                        allowFullScreen
-                        title={v.title || 'Video'}
-                      />
-                    </div>
+                    <MuxPlayerWrapper playbackId={playbackId} title={v.title} />
 
-                    {/*
-                      ALTERNATIVA con Mux Player React (mejor experiencia):
-                      
-                      1. npm install @mux/mux-player-react
-                      2. Creá un Client Component wrapper (ej: components/MuxPlayer.tsx):
-                      
-                          'use client'
-                          import MuxPlayer from '@mux/mux-player-react'
-                          export default function MuxPlayerWrapper({ playbackId, title }: { playbackId: string, title?: string }) {
-                            return (
-                              <MuxPlayer
-                                playbackId={playbackId}
-                                streamType="on-demand"
-                                accentColor="#4A7C3F"
-                                metadata={{ video_title: title }}
-                                style={{ width: '100%', borderRadius: '0.75rem' }}
-                              />
-                            )
-                          }
-                      
-                      3. Reemplazá el iframe de arriba con:
-                          <MuxPlayerWrapper playbackId={playbackId} title={v.title} />
-                    */}
                   </div>
                 )
               }
@@ -265,8 +230,12 @@ export default async function LessonPage({
                             Abrir en Google Drive ↗
                           </a>
                         </div>
-                        <div style={{ borderRadius: '0.75rem', overflow: 'hidden', border: '1px solid rgba(74,124,63,0.15)', background: 'rgba(245,242,232,0.5)' }}>
+                        <div className="hidden md:block" style={{ borderRadius: '0.75rem', overflow: 'hidden', border: '1px solid rgba(74,124,63,0.15)', background: 'rgba(245,242,232,0.5)' }}>
                           <iframe src={previewUrl} title={p.title || 'PDF'} style={{ width: '100%', height: '780px', border: 'none', display: 'block' }} allow="autoplay" />
+                        </div>
+                        <div className="md:hidden mt-4 p-4 text-sm text-center" style={{ background: 'rgba(139,105,20,0.08)', color: '#8B6914', borderRadius: '0.75rem', border: '1px solid rgba(139,105,20,0.2)' }}>
+                          <p>La vista previa de Google Drive suele estar bloqueada en móviles por privacidad del navegador.</p>
+                          <p style={{ marginTop: '0.5rem', fontWeight: 500 }}>Usá el botón "Abrir en Google Drive" de arriba para ver el documento.</p>
                         </div>
                       </>
                     ) : (
