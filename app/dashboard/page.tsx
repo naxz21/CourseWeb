@@ -56,11 +56,7 @@ export default async function DashboardPage() {
   return (
     <main style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F5F2E8 0%, #EDE8D5 100%)', fontFamily: 'Georgia, serif' }}>
 
-<<<<<<< HEAD
-      <header style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(74,124,63,0.15)', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-=======
       <header className="dashboard-header" style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(74,124,63,0.15)', padding: '1rem 2rem', gap: '1rem' }}>
->>>>>>> 84ea700 (version mobiles v1)
         <span style={{ fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4A7C3F' }}>
           El Arte de Fermentar
         </span>
@@ -73,11 +69,7 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-<<<<<<< HEAD
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '3rem 1.5rem' }}>
-=======
       <div className="dashboard-main" style={{ maxWidth: '900px', margin: '0 auto' }}>
->>>>>>> 84ea700 (version mobiles v1)
 
         <div style={{ marginBottom: '3rem' }}>
           <p style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.5rem' }}>Bienvenido de vuelta</p>
@@ -99,11 +91,7 @@ export default async function DashboardPage() {
           )}
 
           {!error && enrollments && enrollments.length > 0 ? (
-<<<<<<< HEAD
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-=======
             <div className="courses-grid">
->>>>>>> 84ea700 (version mobiles v1)
               {enrollments.map((enrollment: any) => {
                 const course = Array.isArray(enrollment.courses) ? enrollment.courses[0] : enrollment.courses
                 if (!course) return null

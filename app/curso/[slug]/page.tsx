@@ -86,11 +86,7 @@ export default async function CoursePage({
 
               {/* Botones de acceso cuando no tiene el curso */}
               {!hasAccess && (
-<<<<<<< HEAD
-                <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
-=======
                 <div className="course-hero-buttons">
->>>>>>> 84ea700 (version mobiles v1)
                   <BuyButton courseId={course.id} title={course.title} price={course.price} userEmail={user.email ?? ''} userId={user.id} />
                   <RedeemCodeButton courseId={course.id} />
                 </div>
@@ -149,11 +145,7 @@ export default async function CoursePage({
                   </div>
 
                   {moduleLessons.length > 0 ? (
-<<<<<<< HEAD
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-=======
                     <div className="lessons-grid">
->>>>>>> 84ea700 (version mobiles v1)
                       {moduleLessons.map((lesson: any) => {
                         const completed = !!progressMap.get(lesson.id)?.completed
                         const locked = !unlockedLessonIds.has(lesson.id)
