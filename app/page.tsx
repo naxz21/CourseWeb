@@ -386,7 +386,11 @@ export default function HomePage() {
         boxShadow: scrollY > 40 ? '0 4px 24px rgba(30,61,26,0.07)' : 'none',
         transition: 'box-shadow 0.3s ease',
       }}>
+<<<<<<< HEAD
         <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 0', gap: '1rem' }}>
+=======
+        <div className="container landing-header" style={{ padding: '0.85rem 0', gap: '1rem' }}>
+>>>>>>> 84ea700 (version mobiles v1)
           <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
             <img src="/logo.png" alt="El Arte de Fermentar" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(74,124,63,0.2)' }} />
             <span className="pf" style={{ color: '#1E3D1A', fontSize: '1.05rem', fontWeight: 400 }}>
@@ -468,7 +472,11 @@ export default function HomePage() {
               </h2>
 
               {/* Dos columnas de items */}
+<<<<<<< HEAD
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem 2rem' }}>
+=======
+              <div className="includes-grid">
+>>>>>>> 84ea700 (version mobiles v1)
                 {/* Columna 1: includes */}
                 <div>
                   <p className="dm" style={{ margin: '0 0 0.75rem 0', fontSize: '0.7rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#8B6914', fontWeight: 500 }}>Modalidad</p>
@@ -566,7 +574,11 @@ export default function HomePage() {
           </div>
           <div className={`card-elevated fade-up ${programaSection.inView ? 'visible' : ''} fade-up-d2`}
             style={{ maxWidth: '760px', margin: '0 auto', padding: '2.5rem' }}>
+<<<<<<< HEAD
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem 2rem' }}>
+=======
+            <div className="programa-grid">
+>>>>>>> 84ea700 (version mobiles v1)
               {learnItems.map(item => (
                 <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
                   <span style={{ color: '#2D5A27', fontWeight: 500, flexShrink: 0, marginTop: '0.1em' }}>✓</span>
@@ -643,7 +655,11 @@ export default function HomePage() {
               opacity: showBio ? 1 : 0,
               transition: 'max-height 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease',
             }}>
+<<<<<<< HEAD
               <div style={{ paddingTop: '1.4rem', display: 'flex', gap: '1.8rem', alignItems: 'flex-start' }}>
+=======
+              <div className="instructor-flex">
+>>>>>>> 84ea700 (version mobiles v1)
                 {/* Foto grande */}
                 <div style={{
                   width: '120px', height: '120px', borderRadius: '50%', flexShrink: 0,
@@ -753,7 +769,11 @@ export default function HomePage() {
             <span className="eyebrow">Precio promocional hasta el 10 de junio</span>
             <h2 className="section-title">Empezá hoy a un precio especial</h2>
           </div>
+<<<<<<< HEAD
           <div className={`card fade-up ${precioSection.inView ? 'visible' : ''} fade-up-d2`}
+=======
+          <div className={`card fade-up ${precioSection.inView ? 'visible' : ''} fade-up-d2 pricing-card`}
+>>>>>>> 84ea700 (version mobiles v1)
             style={{ maxWidth: '480px', margin: '0 auto', padding: '3rem', textAlign: 'center', background: 'linear-gradient(145deg, rgba(45,90,39,0.04), rgba(255,255,255,0.9))' }}>
             <h2 className="pf" style={{ margin: '0 0 0.3rem 0', fontSize: '4.5rem', lineHeight: 1, fontWeight: 400, color: '#1E3D1A' }}>
               $34.800

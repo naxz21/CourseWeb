@@ -24,3 +24,202 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+<<<<<<< HEAD
+=======
+
+/* ========================================
+   CLASES RESPONSIVAS — LANDING PAGE
+   ======================================== */
+
+/* Header de la landing */
+.landing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .landing-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+}
+
+/* Grids de "¿Qué incluye?" y "¿Qué aprenderás?" */
+.includes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem 2rem;
+}
+
+.programa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 2rem;
+}
+
+/* Contenedor flex del instructor (imagen + texto) */
+.instructor-flex {
+  display: flex;
+  gap: 1.8rem;
+  align-items: flex-start;
+}
+
+/* Tarjeta de precio promocional */
+.pricing-card {
+  padding: 3rem;
+}
+
+/* ========================================
+   CLASES RESPONSIVAS — DASHBOARD
+   ======================================== */
+
+/* Header del dashboard */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Contenedor principal del dashboard */
+.dashboard-main {
+  padding: 3rem 1.5rem;
+}
+
+/* Grid de cursos del dashboard */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ========================================
+   CLASES RESPONSIVAS — CURSO / LECCIONES
+   ======================================== */
+
+/* Grid de lecciones dentro de cada módulo */
+.lessons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+/* Botones de acción en hero del curso (Comprar / Canjear) */
+.course-hero-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   CLASES RESPONSIVAS — LECCIÓN (PDF + NAV)
+   ======================================== */
+
+/* Visor de PDF iframe */
+.pdf-iframe {
+  width: 100%;
+  height: 780px;
+  border: none;
+  display: block;
+}
+
+/* Botones de navegación Anterior / Siguiente */
+.nav-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.nav-next {
+  order: 2;
+}
+
+.nav-prev {
+  order: 1;
+}
+
+/* ========================================
+   MEDIA QUERIES — TABLETS (769–1024px)
+   ======================================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .includes-grid,
+  .programa-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}
+
+/* ========================================
+   MEDIA QUERIES — MÓVILES (≤768px)
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Landing: grids de 1 columna */
+  .includes-grid,
+  .programa-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Instructor: apilar imagen sobre texto */
+  .instructor-flex {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Pricing: reducir padding */
+  .pricing-card {
+    padding: 1.5rem;
+  }
+
+  /* Dashboard: grid de 1 columna */
+  .courses-grid {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+
+  /* Dashboard: reducir márgenes */
+  .dashboard-main {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Dashboard header: wrap + centrar */
+  .dashboard-header {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Curso: grid de lecciones a 1 columna */
+  .lessons-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Botones de acceso del curso: 100% de ancho */
+  .course-hero-buttons {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  /* PDF iframe: altura dinámica */
+  .pdf-iframe {
+    height: calc(100vh - 120px);
+  }
+
+  /* Nav buttons: 1 columna, Siguiente primero */
+  .nav-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-next {
+    order: 1;
+  }
+
+  .nav-prev {
+    order: 2;
+  }
+}
+>>>>>>> 84ea700 (version mobiles v1)

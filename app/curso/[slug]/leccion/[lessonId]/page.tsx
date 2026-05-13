@@ -199,6 +199,7 @@ export default async function LessonPage({
         )}
 
         {/* PDFs — sin cambios */}
+<<<<<<< HEAD
         {pdfs.length > 0 && (
           <section style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: '400', color: '#2D5A27' }}>PDFs</h2>
@@ -266,6 +267,71 @@ export default async function LessonPage({
             })}
           </section>
         )}
+=======
+{pdfs.length > 0 && (
+           <section style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+             <h2 style={{ fontSize: '1.1rem', fontWeight: '400', color: '#2D5A27' }}>PDFs</h2>
+             {pdfs.map((p: any) => {
+               const isGdrive = p.provider === 'gdrive'
+
+               if (isGdrive) {
+                 const hasFileId = !!p.provider_file_id
+                 const previewUrl = hasFileId ? buildGDrivePreviewUrl(p.provider_file_id) : null
+
+                 return (
+                   <div key={p.id} style={cardStyle}>
+                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                       <p style={{ fontSize: '0.875rem', color: '#2D5A27', margin: 0 }}>{p.title || 'PDF'}</p>
+                       <span style={{ fontSize: '0.7rem', color: '#1A56A4', background: 'rgba(26,86,164,0.1)', padding: '0.2rem 0.6rem', borderRadius: '999px', whiteSpace: 'nowrap' }}>
+                         ☁ Google Drive
+                       </span>
+                     </div>
+
+                     {hasFileId && previewUrl ? (
+                       <>
+                         <div style={{ marginBottom: '1rem' }}>
+                           <a
+                             href={`https://drive.google.com/file/d/${p.provider_file_id}/view`}
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block' }}
+                           >
+                             Abrir en Google Drive ↗
+                           </a>
+                         </div>
+<div style={{ borderRadius: '0.75rem', overflow: 'hidden', border: '1px solid rgba(74,124,63,0.15)', background: 'rgba(245,242,232,0.5)' }}>
+                            <iframe src={previewUrl} className="pdf-iframe" title={p.title || 'PDF'} allow="autoplay" />
+                          </div>
+                       </>
+                     ) : (
+                       <div style={{ background: 'rgba(180,60,40,0.06)', border: '1px solid rgba(180,60,40,0.15)', borderRadius: '0.75rem', padding: '1rem', fontSize: '0.875rem', color: '#8B2500' }}>
+                         No se pudo cargar el PDF.
+                       </div>
+                     )}
+                   </div>
+                 )
+               }
+
+               return (
+                 <div key={p.id} style={cardStyle}>
+                   <p style={{ fontSize: '0.875rem', color: '#2D5A27', marginBottom: '0.75rem' }}>{p.title || 'PDF'}</p>
+                   <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                     <a href={p.file_url} target="_blank" rel="noopener noreferrer" style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', fontSize: '0.875rem', textDecoration: 'none' }}>
+                       Abrir PDF
+                     </a>
+                     <a href={p.file_url} download style={{ padding: '0.5rem 1.25rem', borderRadius: '999px', border: '1.5px solid #4A7C3F', color: '#4A7C3F', fontSize: '0.875rem', textDecoration: 'none' }}>
+                       Descargar
+                     </a>
+                   </div>
+<div style={{ borderRadius: '0.75rem', overflow: 'hidden', border: '1px solid rgba(74,124,63,0.15)' }}>
+                      <iframe src={p.file_url} className="pdf-iframe" title={p.title || 'PDF'} />
+                   </div>
+                 </div>
+               )
+             })}
+           </section>
+         )}
+>>>>>>> 84ea700 (version mobiles v1)
 
         {/* Imágenes — sin cambios */}
         {images.length > 0 && (
@@ -295,6 +361,7 @@ export default async function LessonPage({
           initialCompleted={isCompleted}
         />
 
+<<<<<<< HEAD
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <div style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(74,124,63,0.15)', borderRadius: '1rem', padding: '1.25rem' }}>
             <p style={{ fontSize: '0.75rem', color: '#8B6914', marginBottom: '0.5rem' }}>Anterior</p>
@@ -313,6 +380,26 @@ export default async function LessonPage({
             ) : <p style={{ fontSize: '0.875rem', color: '#5C5C4A', fontStyle: 'italic' }}>Última lección</p>}
           </div>
         </div>
+=======
+<div className="nav-buttons">
+           <div style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(74,124,63,0.15)', borderRadius: '1rem', padding: '1.25rem' }}>
+             <p style={{ fontSize: '0.75rem', color: '#8B6914', marginBottom: '0.5rem' }}>Anterior</p>
+             {previousLesson ? (
+               <Link href={`/curso/${slug}/leccion/${previousLesson.id}`} style={{ display: 'inline-block', padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', fontSize: '0.85rem', textDecoration: 'none' }}>
+                 ← {previousLesson.title}
+               </Link>
+             ) : <p style={{ fontSize: '0.875rem', color: '#5C5C4A', fontStyle: 'italic' }}>Primera lección</p>}
+           </div>
+           <div style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(74,124,63,0.15)', borderRadius: '1rem', padding: '1.25rem' }}>
+             <p style={{ fontSize: '0.75rem', color: '#8B6914', marginBottom: '0.5rem' }}>Siguiente</p>
+             {nextLesson ? (
+               <Link href={`/curso/${slug}/leccion/${nextLesson.id}`} style={{ display: 'inline-block', padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', fontSize: '0.85rem', textDecoration: 'none' }}>
+                 {nextLesson.title} →
+               </Link>
+             ) : <p style={{ fontSize: '0.875rem', color: '#5C5C4A', fontStyle: 'italic' }}>Última lección</p>}
+           </div>
+         </div>
+>>>>>>> 84ea700 (version mobiles v1)
 
       </div>
     </main>
