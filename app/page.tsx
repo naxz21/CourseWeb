@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 
 function useInView(threshold = 0.15) {
@@ -70,13 +71,13 @@ export default function HomePage() {
     setAskedSet((prev) => new Set(prev).add(faq.q))
   }
 
-  const hero = useInView(0.1)
-  const includesSection = useInView()
-  const howSection = useInView()
-  const programaSection = useInView()
-  const faqSection = useInView()
-  const instructorSection = useInView()
-  const precioSection = useInView()
+  const { ref: heroRef, inView: heroInView } = useInView(0.1)
+  const { ref: includesRef, inView: includesInView } = useInView()
+  const { ref: howRef, inView: howInView } = useInView()
+  const { ref: programaRef, inView: programaInView } = useInView()
+  const { ref: faqRef, inView: faqInView } = useInView()
+  const { ref: instructorRef, inView: instructorInView } = useInView()
+  const { ref: precioRef, inView: precioInView } = useInView()
 
   return (
     <main style={{ minHeight: '100vh', background: '#F7F4EC', fontFamily: "'Georgia', 'Times New Roman', serif", color: '#2E3A2C', overflowX: 'hidden' }}>
@@ -131,7 +132,7 @@ export default function HomePage() {
 
         .section-text {
           font-family: 'DM Sans', sans-serif;
-          color: #5A6050;
+          color: #3A4030;
           font-size: 1.05rem;
           line-height: 1.85;
           max-width: 640px;
@@ -221,7 +222,7 @@ export default function HomePage() {
           position: relative;
           padding-left: 2rem;
           font-family: 'DM Sans', sans-serif;
-          color: #4A5244;
+          color: #2E3A2C;
           line-height: 1.7;
           font-weight: 300;
         }
@@ -255,7 +256,7 @@ export default function HomePage() {
         }
         .feature-list li {
           font-family: 'DM Sans', sans-serif;
-          color: #4A5244;
+          color: #2E3A2C;
           line-height: 1.7;
           font-weight: 300;
           padding-left: 1.4rem;
@@ -361,6 +362,10 @@ export default function HomePage() {
           box-shadow: 0 4px 12px rgba(45,90,39,0.08);
         }
 
+        .hero-logo-mobile {
+          display: none;
+        }
+
         @media (max-width: 960px) {
           .grid-4 { grid-template-columns: repeat(2, 1fr); }
           .grid-2 { grid-template-columns: 1fr; }
@@ -368,6 +373,19 @@ export default function HomePage() {
         @media (max-width: 640px) {
           .section { padding: 4.5rem 0; }
           .grid-4 { grid-template-columns: 1fr; }
+          .hero-logo-desktop { display: none; }
+          .hero-logo-mobile {
+            display: block;
+            width: min(260px, 82vw);
+            margin: 0 auto 1.35rem auto;
+          }
+          .hero-logo-mobile img {
+            display: block;
+            width: 100%;
+            border-radius: 18px;
+            background: #F0EDE4;
+            border: 1px solid rgba(74,124,63,0.14);
+          }
         }
       `}</style>
 
@@ -387,12 +405,12 @@ export default function HomePage() {
         transition: 'box-shadow 0.3s ease',
       }}>
         <div className="container landing-header" style={{ padding: '0.85rem 0', gap: '1rem' }}>
-          <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
             <img src="/logo.png" alt="El Arte de Fermentar" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(74,124,63,0.2)' }} />
             <span className="pf" style={{ color: '#1E3D1A', fontSize: '1.05rem', fontWeight: 400 }}>
               <em style={{ fontStyle: 'italic', color: '#8B6914' }}>El Arte</em> de Fermentar
             </span>
-          </a>
+          </Link>
           <nav style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
             <a href="/login" className="btn-secondary" style={{ padding: '0.55rem 1.1rem', fontSize: '0.88rem' }}>Iniciar sesión</a>
             <a href="/register" className="btn-primary" style={{ padding: '0.55rem 1.1rem', fontSize: '0.88rem' }}>Inscribirme</a>
@@ -411,35 +429,38 @@ export default function HomePage() {
         }} />
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
           <div className="grid-2" style={{ alignItems: 'center', gap: '3rem' }}>
-            <div ref={hero.ref}>
-              <div className={`fade-up ${hero.inView ? 'visible' : ''}`}>
-                <span className="eyebrow">🌿 Curso de Alimentos Fermentados</span>
+            <div ref={heroRef}>
+              <div className={`fade-up ${heroInView ? 'visible' : ''}`}>
+                <span className="eyebrow">Curso de Alimentos Fermentados</span>
               </div>
-              <h1 className={`pf fade-up ${hero.inView ? 'visible' : ''} fade-up-d1`} style={{
+              <h1 className={`pf fade-up ${heroInView ? 'visible' : ''} fade-up-d1`} style={{
                 fontSize: 'clamp(2.8rem, 6vw, 5rem)',
                 lineHeight: 1.06, fontWeight: 400, color: '#1E3D1A',
                 margin: '0 0 1.4rem 0',
               }}>
                 Aprende el arte de fermentar<em style={{ fontStyle: 'italic', color: '#8B6914' }}> en casa</em>
               </h1>
-              <p className={`dm fade-up ${hero.inView ? 'visible' : ''} fade-up-d2`} style={{ fontSize: '1.08rem', color: '#5A6050', maxWidth: '560px', lineHeight: 1.85, margin: '0 0 0.75rem 0', fontWeight: 300 }}>
-                Aprendé a fermentar en casa sin miedos, con base científica explicada de forma simple.
+              <div className={`hero-logo-mobile scale-in ${heroInView ? 'visible' : ''} fade-up-d2`}>
+                <img src="/logo.png" alt="El Arte de Fermentar" />
+              </div>
+              <p className={`dm fade-up ${heroInView ? 'visible' : ''} fade-up-d2`} style={{ fontSize: '1.08rem', color: '#3A4030', maxWidth: '560px', lineHeight: 1.85, margin: '0 0 0.75rem 0', fontWeight: 300 }}>
+                Aprendé a fermentar en casa sin miedos, con base científica explicada de forma sencilla.
               </p>
-              <p className={`dm fade-up ${hero.inView ? 'visible' : ''} fade-up-d3`} style={{ fontSize: '1rem', color: '#5A6050', maxWidth: '560px', lineHeight: 1.85, margin: '0 0 2rem 0', fontWeight: 300 }}>
+              <p className={`dm fade-up ${heroInView ? 'visible' : ''} fade-up-d3`} style={{ fontSize: '1rem', color: '#3A4030', maxWidth: '560px', lineHeight: 1.85, margin: '0 0 2rem 0', fontWeight: 300 }}>
                 Técnicas simples y seguras, explicadas paso a paso con ingredientes fáciles de conseguir. En este curso vas a poder hacer tus propios fermentos en casa desde el primer día.
               </p>
-              <div className={`fade-up ${hero.inView ? 'visible' : ''} fade-up-d4`} style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+              <div className={`fade-up ${heroInView ? 'visible' : ''} fade-up-d4`} style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
                 <a href="#precio" className="btn-primary" style={{ padding: '0.9rem 1.7rem', fontSize: '0.97rem' }}>👉 Ver oferta especial</a>
                 <a href="#programa" className="btn-secondary" style={{ padding: '0.9rem 1.7rem', fontSize: '0.97rem' }}>Ver programa</a>
               </div>
-              <div className={`fade-up ${hero.inView ? 'visible' : ''} fade-up-d5`} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+              <div className={`fade-up ${heroInView ? 'visible' : ''} fade-up-d5`} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
                 {['100% online', 'Acceso inmediato', 'A tu ritmo', 'Acceso por un año'].map(b => (
                   <span key={b} className="badge dm">{b}</span>
                 ))}
               </div>
             </div>
 
-            <div className={`scale-in ${hero.inView ? 'visible' : ''} fade-up-d2`} style={{ position: 'relative' }}>
+            <div className={`hero-logo-desktop scale-in ${heroInView ? 'visible' : ''} fade-up-d2`} style={{ position: 'relative' }}>
               <div style={{
                 position: 'absolute', inset: '-14px', borderRadius: '36px',
                 background: 'linear-gradient(135deg, rgba(74,124,63,0.09), rgba(139,105,20,0.05))',
@@ -456,12 +477,12 @@ export default function HomePage() {
       <hr className="divider" />
 
       {/* INCLUDES + OFFER */}
-      <section className="section" ref={includesSection.ref}>
+      <section className="section" ref={includesRef}>
         <div className="container">
           <div style={{ maxWidth: '760px', margin: '0 auto' }}>
 
             {/* Card unificada: Incluye + Ofrecemos */}
-            <div className={`card-elevated fade-up ${includesSection.inView ? 'visible' : ''}`} style={{ padding: '2.5rem' }}>
+            <div className={`card-elevated fade-up ${includesInView ? 'visible' : ''}`} style={{ padding: '2.5rem' }}>
               <span className="eyebrow">¿Qué incluye el curso?</span>
               <h2 className="pf" style={{ margin: '0 0 1.75rem 0', fontSize: '1.85rem', lineHeight: 1.2, fontWeight: 400, color: '#1E3D1A' }}>
                 En este curso aprenderás a fermentar desde cero, con una sólida base científica
@@ -502,9 +523,9 @@ export default function HomePage() {
       <hr className="divider" />
 
       {/* HOW IT WORKS */}
-      <section className="section" ref={howSection.ref}>
+      <section className="section" ref={howRef}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <div className={`fade-up ${howSection.inView ? 'visible' : ''}`}>
+          <div className={`fade-up ${howInView ? 'visible' : ''}`}>
             <span className="eyebrow">¿Cómo funciona?</span>
             <h2 className="section-title">Un proceso simple, claro y rápido</h2>
             <p className="section-text dm" style={{ margin: '0 auto 3rem auto' }}>
@@ -533,19 +554,19 @@ export default function HomePage() {
               },
               {
                 n: '04',
-                icon: '🌿',
+                icon: '',
                 title: 'Aprendé a tu ritmo',
                 text: 'Navegá los módulos en orden o a tu criterio. Mirá los videos, descargá el material y consultale a la docente cuando lo necesites.',
               },
             ].map((step, i) => (
-              <div key={step.n} className={`card step-card fade-up ${howSection.inView ? 'visible' : ''} fade-up-d${i + 1}`}
+              <div key={step.n} className={`card step-card fade-up ${howInView ? 'visible' : ''} fade-up-d${i + 1}`}
                 style={{ padding: '1.8rem', textAlign: 'left' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.1rem' }}>
                   <div className="number dm">{step.n}</div>
-                  <span style={{ fontSize: '1.3rem' }}>{step.icon}</span>
+                  {step.icon && <span style={{ fontSize: '1.3rem' }}>{step.icon}</span>}
                 </div>
                 <h3 className="pf" style={{ margin: '0 0 0.6rem 0', fontSize: '1.15rem', fontWeight: 400, color: '#1E3D1A' }}>{step.title}</h3>
-                <p className="dm" style={{ margin: 0, color: '#5D6357', lineHeight: 1.75, fontWeight: 300, fontSize: '0.9rem' }}>{step.text}</p>
+                <p className="dm" style={{ margin: 0, color: '#3A4030', lineHeight: 1.75, fontWeight: 300, fontSize: '0.9rem' }}>{step.text}</p>
               </div>
             ))}
           </div>
@@ -555,22 +576,22 @@ export default function HomePage() {
       <hr className="divider" />
 
       {/* WHAT YOU'LL LEARN */}
-      <section className="section" id="programa" ref={programaSection.ref}>
+      <section className="section" id="programa" ref={programaRef}>
         <div className="container">
-          <div className={`fade-up ${programaSection.inView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div className={`fade-up ${programaInView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <span className="eyebrow">¿Qué aprenderás?</span>
             <h2 className="section-title">Fermentación explicada de forma simple y práctica</h2>
             <p className="section-text dm" style={{ margin: '0 auto' }}>
-              Fundamentos, seguridad y preparaciones concretas para empezar desde cero con confianza.
+              Fundamentos, seguridad y procedimientos para empezar desde cero con confianza.
             </p>
           </div>
-          <div className={`card-elevated fade-up ${programaSection.inView ? 'visible' : ''} fade-up-d2`}
+          <div className={`card-elevated fade-up ${programaInView ? 'visible' : ''} fade-up-d2`}
             style={{ maxWidth: '760px', margin: '0 auto', padding: '2.5rem' }}>
             <div className="programa-grid">
               {learnItems.map(item => (
                 <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
                   <span style={{ color: '#2D5A27', fontWeight: 500, flexShrink: 0, marginTop: '0.1em' }}>✓</span>
-                  <span className="dm" style={{ color: '#4A5244', fontSize: '0.97rem', lineHeight: 1.7, fontWeight: 300 }}>{item}</span>
+                  <span className="dm" style={{ color: '#2E3A2C', fontSize: '0.97rem', lineHeight: 1.7, fontWeight: 300 }}>{item}</span>
                 </div>
               ))}
             </div>
@@ -582,13 +603,13 @@ export default function HomePage() {
       <hr className="divider" />
 
       {/* INSTRUCTOR */}
-      <section className="section" ref={instructorSection.ref}>
+      <section className="section" ref={instructorRef}>
         <div className="container">
-          <div className={`fade-up ${instructorSection.inView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div className={`fade-up ${instructorInView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <span className="eyebrow">👩‍🏫 ¿Quién imparte el curso?</span>
             <h2 className="section-title">Conocé a tu docente</h2>
           </div>
-          <div className={`card fade-up ${instructorSection.inView ? 'visible' : ''} fade-up-d2`}
+          <div className={`card fade-up ${instructorInView ? 'visible' : ''} fade-up-d2`}
             style={{ padding: '1.75rem', maxWidth: '720px', margin: '0 auto' }}>
 
             {/* Fila clickeable: foto + nombre + toggle */}
@@ -639,7 +660,7 @@ export default function HomePage() {
             {/* Bio expandible */}
             <div style={{
               overflow: 'hidden',
-              maxHeight: showBio ? '800px' : '0px',
+              maxHeight: showBio ? '2000px' : '0px',
               opacity: showBio ? 1 : 0,
               transition: 'max-height 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease',
             }}>
@@ -663,12 +684,12 @@ export default function HomePage() {
                   />
                 </div>
                 {/* Texto */}
-                <div className="dm" style={{ display: 'grid', gap: '0.8rem', color: '#4A5244', fontSize: '0.93rem', lineHeight: 1.8, fontWeight: 300 }}>
+                <div className="dm" style={{ display: 'grid', gap: '0.8rem', color: '#2E3A2C', fontSize: '0.93rem', lineHeight: 1.8, fontWeight: 300 }}>
                   <p style={{ margin: 0 }}>Profesora Titular de la cátedra Microbiología General de la carrera Ingeniería de Alimentos de la Facultad de Ciencias de la Alimentación de la UNER, donde además se desempeña como docente de posgrado en carreras de doctorado y especialización vinculadas a microbiología, metodología de la investigación y tecnología de alimentos.</p>
                   <p style={{ margin: 0 }}>Dirige el Laboratorio de Microbiología y Biotecnología de Alimentos de la UNER, dedicado al análisis microbiológico de alimentos, aguas y ambientes, así como al desarrollo de investigaciones aplicadas en microbiología alimentaria y biotecnología.</p>
                   <p style={{ margin: 0 }}>Cuenta con más de <strong style={{ color: '#2D5A27', fontWeight: 500 }}>25 años de experiencia</strong> en docencia universitaria, investigación y formación de recursos humanos, dirigiendo tesis doctorales, becarios e investigadores en el área de microbiología y fermentaciones alimentarias.</p>
                   <p style={{ margin: 0 }}>Su trabajo científico se enfoca en: microbiología de alimentos, microorganismos de interés biotecnológico, fermentaciones, levaduras y bacterias lácticas, fermentaciones vínicas, inocuidad alimentaria y desarrollo de fermentos autóctonos.</p>
-                  <p style={{ margin: 0 }}>Desde <em style={{ fontStyle: 'italic', color: '#8B6914' }}>"El arte de fermentar en casa"</em>, combina su experiencia científica y académica con una propuesta práctica y accesible para acercar el mundo de los alimentos fermentados a personas interesadas en aprender a fermentar de manera segura, consciente y aplicada a la vida cotidiana.</p>
+                  <p style={{ margin: 0 }}>Desde <em style={{ fontStyle: 'italic', color: '#8B6914' }}>&quot;El arte de fermentar en casa&quot;</em>, combina su experiencia científica y académica con una propuesta práctica y accesible para acercar el mundo de los alimentos fermentados a personas interesadas en aprender a fermentar de manera segura, consciente y aplicada a la vida cotidiana.</p>
                 </div>
               </div>
             </div>
@@ -680,13 +701,13 @@ export default function HomePage() {
       <hr className="divider" />
 
       {/* FAQ CHATBOT */}
-      <section className="section" ref={faqSection.ref}>
+      <section className="section" ref={faqRef}>
         <div className="container">
-          <div className={`fade-up ${faqSection.inView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div className={`fade-up ${faqInView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <span className="eyebrow">Preguntas frecuentes</span>
             <h2 className="section-title">Resolvé tus dudas antes de comprar</h2>
           </div>
-          <div className={`card fade-up ${faqSection.inView ? 'visible' : ''} fade-up-d2`}
+          <div className={`card fade-up ${faqInView ? 'visible' : ''} fade-up-d2`}
             style={{ padding: '1.75rem', maxWidth: '720px', margin: '0 auto' }}>
             {chatHistory.length > 0 && (
               <div style={{ marginBottom: '1.4rem', display: 'grid', gap: '0.9rem' }}>
@@ -702,16 +723,10 @@ export default function HomePage() {
                         {item.q}
                       </span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', gap: '0.5rem' }}>
-                      <div style={{
-                        width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-                        background: 'rgba(45,90,39,0.1)', border: '1px solid rgba(45,90,39,0.18)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '0.75rem', marginTop: '3px',
-                      }}>🌿</div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
                       <span className="dm" style={{
                         background: 'rgba(45,90,39,0.06)', color: '#2E3A2C',
-                        borderRadius: '4px 18px 18px 18px',
+                        borderRadius: '18px',
                         padding: '0.6rem 1.1rem', fontSize: '0.92rem',
                         maxWidth: '85%', lineHeight: 1.65, fontWeight: 300,
                         border: '1px solid rgba(45,90,39,0.1)',
@@ -735,7 +750,7 @@ export default function HomePage() {
                 ))}
                 {faqs.filter(f => !askedSet.has(f.q)).length === 0 && (
                   <p className="dm" style={{ margin: 0, color: '#9BA490', fontSize: '0.9rem', fontWeight: 300 }}>
-                    ¡Respondimos todas tus preguntas! 🌿
+                    ¡Respondimos todas tus preguntas!
                   </p>
                 )}
               </div>
@@ -747,13 +762,13 @@ export default function HomePage() {
       <hr className="divider" />
 
       {/* PRECIO */}
-      <section id="precio" className="section" ref={precioSection.ref} style={{ scrollMarginTop: '80px' }}>
+      <section id="precio" className="section" ref={precioRef} style={{ scrollMarginTop: '80px' }}>
         <div className="container">
-          <div className={`fade-up ${precioSection.inView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div className={`fade-up ${precioInView ? 'visible' : ''}`} style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <span className="eyebrow">Precio promocional hasta el 10 de junio</span>
             <h2 className="section-title">Empezá hoy a un precio especial</h2>
           </div>
-          <div className={`card fade-up ${precioSection.inView ? 'visible' : ''} fade-up-d2 pricing-card`}
+          <div className={`card fade-up ${precioInView ? 'visible' : ''} fade-up-d2 pricing-card`}
             style={{ maxWidth: '480px', margin: '0 auto', padding: '3rem', textAlign: 'center', background: 'linear-gradient(145deg, rgba(45,90,39,0.04), rgba(255,255,255,0.9))' }}>
             <h2 className="pf" style={{ margin: '0 0 0.3rem 0', fontSize: '4.5rem', lineHeight: 1, fontWeight: 400, color: '#1E3D1A' }}>
               $34.800
