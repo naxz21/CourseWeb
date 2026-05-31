@@ -33,12 +33,10 @@ export default async function CoursePage({
     [...(module.lessons || [])].sort((a: any, b: any) => a.position - b.position).map((lesson: any) => ({ ...lesson, moduleId: module.id, moduleTitle: module.title, modulePosition: module.position }))
   )
 
-  const unlockedLessonIds = new Set<string>()
-  flatLessons.forEach((lesson: any, index: number) => {
-    if (index === 0) { unlockedLessonIds.add(lesson.id); return }
-    const prevLesson = flatLessons[index - 1]
-    if (progressMap.get(prevLesson.id)?.completed) unlockedLessonIds.add(lesson.id)
-  })
+  // Acceso libre — todas las lecciones desbloqueadas si el usuario tiene acceso al curso
+  const unlockedLessonIds = hasAccess
+    ? new Set(flatLessons.map((lesson: any) => lesson.id))
+    : new Set<string>()
 
   const totalLessons = flatLessons.length
   const completedLessons = flatLessons.filter((l: any) => progressMap.get(l.id)?.completed).length
@@ -51,7 +49,11 @@ export default async function CoursePage({
 
   return (
     <main style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #F5F2E8 0%, #EDE8D5 100%)', fontFamily: 'Georgia, serif' }}>
-      <style>{`.lesson-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,124,63,0.1); }`}</style>
+      <style>{`
+        .lesson-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,124,63,0.1); }
+        .index-row { transition: background 0.15s, box-shadow 0.15s; }
+        .index-row:hover { background: rgba(74,124,63,0.1) !important; box-shadow: 0 2px 8px rgba(74,124,63,0.08); }
+      `}</style>
 
       <header style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(74,124,63,0.15)', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4A7C3F' }}>El Arte de Fermentar</span>
@@ -95,6 +97,103 @@ export default async function CoursePage({
           </div>
         </section>
 
+        {/* Índice de contenido — acordeón por módulo */}
+        {hasAccess && safeModules.length > 0 && (
+          <section style={{ borderRadius: '1.25rem', overflow: 'hidden', border: '1px solid rgba(74,124,63,0.15)' }}>
+            <style>{`
+              .ci-summary {
+                list-style: none;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.9rem 1.25rem;
+                cursor: pointer;
+                user-select: none;
+                background: rgba(255,255,255,0.55);
+                border-bottom: 1px solid rgba(74,124,63,0.1);
+                font-family: Georgia, serif;
+                transition: background 0.15s;
+              }
+              .ci-summary:hover { background: rgba(74,124,63,0.06); }
+              .ci-summary::-webkit-details-marker { display: none; }
+              details[open] .ci-summary { background: rgba(74,124,63,0.07); }
+              .ci-chevron { transition: transform 0.2s; font-style: normal; font-size: 0.7rem; color: #4A7C3F; }
+              details[open] .ci-chevron { transform: rotate(180deg); }
+              .ci-row { transition: background 0.12s; }
+              .ci-row:hover { background: rgba(74,124,63,0.07) !important; }
+            `}</style>
+
+            {/* Cabecera */}
+            <div style={{ padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.4)', borderBottom: '1px solid rgba(74,124,63,0.12)', display: 'flex', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4A7C3F' }}>Contenido del curso</span>
+              <span style={{ fontSize: '0.7rem', color: '#5C5C4A', marginLeft: 'auto' }}>{completedLessons}/{totalLessons} completadas</span>
+            </div>
+
+            {safeModules.map((module: any, moduleIndex: number) => {
+              const moduleLessons = [...(module.lessons || [])].sort((a: any, b: any) => a.position - b.position)
+              const moduleCompleted = moduleLessons.filter((l: any) => progressMap.get(l.id)?.completed).length
+              const hasInProgress = moduleLessons.some((l: any) => {
+                const p = progressMap.get(l.id)
+                return !!p?.last_viewed_at && !p?.completed
+              })
+
+              return (
+                <details key={module.id} open={moduleIndex === 0 || hasInProgress}>
+                  <summary className="ci-summary">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: '0.65rem', color: '#8B6914', letterSpacing: '0.1em', textTransform: 'uppercase', flexShrink: 0 }}>
+                        {moduleIndex + 1}
+                      </span>
+                      <span style={{ fontSize: '0.875rem', color: '#2D5A27', fontWeight: hasInProgress ? '600' : '400', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {module.title}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+                      <span style={{ fontSize: '0.7rem', color: '#5C5C4A' }}>{moduleCompleted}/{moduleLessons.length}</span>
+                      <em className="ci-chevron">▾</em>
+                    </div>
+                  </summary>
+
+                  <div style={{ background: 'rgba(245,242,232,0.4)' }}>
+                    {moduleLessons.map((lesson: any, lessonIdx: number) => {
+                      const completed = !!progressMap.get(lesson.id)?.completed
+                      const inProgress = !!progressMap.get(lesson.id)?.last_viewed_at && !completed
+                      return (
+                        <Link
+                          key={lesson.id}
+                          href={`/curso/${slug}/leccion/${lesson.id}`}
+                          className="ci-row"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '0.6rem 1.25rem 0.6rem 2.25rem',
+                            borderBottom: lessonIdx < moduleLessons.length - 1 ? '1px solid rgba(74,124,63,0.07)' : 'none',
+                            background: inProgress ? 'rgba(139,105,20,0.05)' : 'transparent',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <span style={{ fontSize: '0.7rem', flexShrink: 0, color: completed ? '#4A7C3F' : inProgress ? '#8B6914' : 'rgba(74,124,63,0.3)', lineHeight: 1 }}>
+                            {completed ? '✓' : inProgress ? '▶' : '○'}
+                          </span>
+                          <span style={{ flex: 1, fontSize: '0.825rem', color: completed ? '#4A7C3F' : inProgress ? '#8B6914' : '#5C5C4A', fontWeight: inProgress ? '500' : '400', lineHeight: '1.3' }}>
+                            {lesson.title}
+                          </span>
+                          {inProgress && (
+                            <span style={{ fontSize: '0.6rem', padding: '0.1rem 0.45rem', borderRadius: '999px', background: 'rgba(139,105,20,0.15)', color: '#8B6914', flexShrink: 0 }}>
+                              En progreso
+                            </span>
+                          )}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </details>
+              )
+            })}
+          </section>
+        )}
+
         {/* Continuar */}
         {hasAccess && continueLesson && (
           <section style={{ background: 'rgba(74,124,63,0.08)', border: '1px solid rgba(74,124,63,0.25)', borderRadius: '1.25rem', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
@@ -124,10 +223,9 @@ export default async function CoursePage({
               const moduleLessons = [...(module.lessons || [])].sort((a: any, b: any) => a.position - b.position)
               const moduleCompleted = moduleLessons.filter((l: any) => progressMap.get(l.id)?.completed).length
               const moduleProgress = moduleLessons.length > 0 ? Math.round((moduleCompleted / moduleLessons.length) * 100) : 0
-              const isModuleUnlocked = moduleLessons.length === 0 || moduleLessons.some((l: any) => unlockedLessonIds.has(l.id))
 
               return (
-                <section key={module.id} style={{ background: 'rgba(255,255,255,0.6)', border: `1px solid ${isModuleUnlocked ? 'rgba(74,124,63,0.2)' : 'rgba(74,124,63,0.1)'}`, borderRadius: '1.25rem', padding: '1.75rem', boxShadow: '0 2px 12px rgba(74,124,63,0.05)', opacity: isModuleUnlocked ? 1 : 0.7 }}>
+                <section key={module.id} style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '1.25rem', padding: '1.75rem', boxShadow: '0 2px 12px rgba(74,124,63,0.05)' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
                     <div>
                       <p style={{ fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '0.25rem' }}>Módulo {moduleIndex + 1}</p>
@@ -148,30 +246,24 @@ export default async function CoursePage({
                     <div className="lessons-grid">
                       {moduleLessons.map((lesson: any) => {
                         const completed = !!progressMap.get(lesson.id)?.completed
-                        const locked = !unlockedLessonIds.has(lesson.id)
                         return (
-                          <div key={lesson.id} className="lesson-card" style={{ background: completed ? 'rgba(74,124,63,0.06)' : 'rgba(245,242,232,0.8)', border: `1px solid ${completed ? 'rgba(74,124,63,0.25)' : locked ? 'rgba(74,124,63,0.1)' : 'rgba(74,124,63,0.15)'}`, borderRadius: '1rem', overflow: 'hidden', opacity: locked ? 0.6 : 1, transition: 'transform 0.2s, box-shadow 0.2s' }}>
+                          <div key={lesson.id} className="lesson-card" style={{ background: completed ? 'rgba(74,124,63,0.06)' : 'rgba(245,242,232,0.8)', border: `1px solid ${completed ? 'rgba(74,124,63,0.25)' : 'rgba(74,124,63,0.15)'}`, borderRadius: '1rem', overflow: 'hidden', transition: 'transform 0.2s, box-shadow 0.2s' }}>
                             {lesson.cover_image_url ? (
                               <img src={lesson.cover_image_url} alt={lesson.title} style={{ width: '100%', height: '140px', objectFit: 'cover' }} />
                             ) : (
                               <div style={{ width: '100%', height: '140px', background: 'linear-gradient(135deg, rgba(74,124,63,0.1), rgba(139,105,20,0.08))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <span style={{ fontSize: '2rem', opacity: 0.3 }}>{locked ? '🔒' : '📖'}</span>
+                                <span style={{ fontSize: '2rem', opacity: 0.3 }}>📖</span>
                               </div>
                             )}
                             <div style={{ padding: '1rem' }}>
                               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                                 {completed && <span style={{ fontSize: '0.65rem', padding: '0.2rem 0.6rem', borderRadius: '999px', background: 'rgba(74,124,63,0.15)', color: '#2D5A27' }}>✓ Completada</span>}
-                                {!completed && !locked && <span style={{ fontSize: '0.65rem', padding: '0.2rem 0.6rem', borderRadius: '999px', background: 'rgba(139,105,20,0.1)', color: '#8B6914' }}>Disponible</span>}
-                                {locked && <span style={{ fontSize: '0.65rem', padding: '0.2rem 0.6rem', borderRadius: '999px', background: 'rgba(0,0,0,0.06)', color: '#5C5C4A' }}>🔒 Bloqueada</span>}
+                                {!completed && <span style={{ fontSize: '0.65rem', padding: '0.2rem 0.6rem', borderRadius: '999px', background: 'rgba(139,105,20,0.1)', color: '#8B6914' }}>Disponible</span>}
                               </div>
                               <h3 style={{ fontSize: '0.95rem', fontWeight: '400', color: '#2D5A27', marginBottom: '0.75rem', lineHeight: '1.4' }}>{lesson.title}</h3>
-                              {locked ? (
-                                <span style={{ fontSize: '0.75rem', color: '#5C5C4A', fontStyle: 'italic' }}>Completá la anterior para desbloquear</span>
-                              ) : (
-                                <Link href={`/curso/${slug}/leccion/${lesson.id}`} style={{ display: 'inline-block', padding: '0.4rem 1rem', borderRadius: '999px', background: completed ? 'rgba(74,124,63,0.15)' : '#4A7C3F', color: completed ? '#2D5A27' : '#F5F2E8', fontSize: '0.8rem', textDecoration: 'none' }}>
-                                  {completed ? 'Revisar' : 'Ver lección →'}
-                                </Link>
-                              )}
+                              <Link href={`/curso/${slug}/leccion/${lesson.id}`} style={{ display: 'inline-block', padding: '0.4rem 1rem', borderRadius: '999px', background: completed ? 'rgba(74,124,63,0.15)' : '#4A7C3F', color: completed ? '#2D5A27' : '#F5F2E8', fontSize: '0.8rem', textDecoration: 'none' }}>
+                                {completed ? 'Revisar' : 'Ver lección →'}
+                              </Link>
                             </div>
                           </div>
                         )

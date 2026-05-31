@@ -26,22 +26,25 @@ const labelStyle: React.CSSProperties = {
 export default function CreateCourseForm() {
   const router = useRouter()
 
-  const [title, setTitle]           = useState('')
-  const [slug, setSlug]             = useState('')
-  const [description, setDescription] = useState('')
-  const [price, setPrice]           = useState('')
-  const [published, setPublished]   = useState(false)
-  const [coverFile, setCoverFile]   = useState<File | null>(null)
-  const [loading, setLoading]       = useState(false)
-  const [success, setSuccess]       = useState(false)
-  const [error, setError]           = useState('')
+  const [title, setTitle]               = useState('')
+  const [slug, setSlug]                 = useState('')
+  const [description, setDescription]   = useState('')
+  const [price, setPrice]               = useState('')
+  const [published, setPublished]       = useState(false)
+  const [coverFile, setCoverFile]       = useState<File | null>(null)
+  const [aspectRatio, setAspectRatio]   = useState<'9:16' | '4:3'>('9:16')
+  const [loading, setLoading]           = useState(false)
+  const [success, setSuccess]           = useState(false)
+  const [error, setError]               = useState('')
+
+  const previewHeight = aspectRatio === '9:16' ? '220px' : '140px'
 
   async function uploadCoverImage(file: File): Promise<string | null> {
     const supabase = createClient()
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return null
     const ext = file.name.split('.').pop()
-    const path = `covers/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const path = `covers/${aspectRatio.replace(':', 'x')}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const { error } = await supabase.storage.from('course-covers').upload(path, file, { contentType: file.type, upsert: false })
     if (error) { setError('Error al subir imagen: ' + error.message); return null }
     return supabase.storage.from('course-covers').getPublicUrl(path).data.publicUrl
@@ -63,13 +66,13 @@ export default function CreateCourseForm() {
     const res = await fetch('/api/admin/courses/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders },
-      body: JSON.stringify({ title, slug, description, price: Number(price), published, cover_image_url: coverImageUrl }),
+      body: JSON.stringify({ title, slug, description, price: Number(price), published, cover_image_url: coverImageUrl, cover_aspect_ratio: aspectRatio }),
     })
 
     const data = await res.json()
     if (!res.ok) { setError(data.error || 'Error al crear curso'); setLoading(false); return }
 
-    setTitle(''); setSlug(''); setDescription(''); setPrice(''); setPublished(false); setCoverFile(null)
+    setTitle(''); setSlug(''); setDescription(''); setPrice(''); setPublished(false); setCoverFile(null); setAspectRatio('9:16')
     setSuccess(true)
     setTimeout(() => setSuccess(false), 3000)
     router.refresh()
@@ -99,14 +102,40 @@ export default function CreateCourseForm() {
         <input type="number" placeholder="0" value={price} onChange={(e) => setPrice(e.target.value)} style={inputStyle} min="0" required />
       </div>
 
-      <div style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '0.75rem', padding: '1rem' }}>
+      <div style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(74,124,63,0.2)', borderRadius: '0.75rem', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <label style={labelStyle}>Imagen de portada</label>
+
+        {/* Selector de relación de aspecto */}
+        <div>
+          <label style={{ ...labelStyle, marginBottom: '0.5rem' }}>Relación de aspecto</label>
+          <div style={{ display: 'flex', gap: '1.5rem' }}>
+            {(['9:16', '4:3'] as const).map((ratio) => (
+              <label key={ratio} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem', color: aspectRatio === ratio ? '#2D5A27' : '#5C5C4A', fontWeight: aspectRatio === ratio ? '600' : '400' }}>
+                <input
+                  type="radio"
+                  value={ratio}
+                  checked={aspectRatio === ratio}
+                  onChange={(e) => setAspectRatio(e.target.value as '9:16' | '4:3')}
+                  style={{ width: '1rem', height: '1rem', accentColor: '#4A7C3F' }}
+                />
+                {ratio === '9:16' ? 'Vertical (9:16)' : 'Horizontal (4:3)'}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Preview con altura dinámica según aspect ratio */}
         {coverFile && (
-          <img src={URL.createObjectURL(coverFile)} alt="preview" style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '0.5rem', marginBottom: '0.75rem', border: '1px solid rgba(74,124,63,0.15)' }} />
+          <img
+            src={URL.createObjectURL(coverFile)}
+            alt="preview"
+            style={{ width: '100%', height: previewHeight, objectFit: 'cover', borderRadius: '0.5rem', border: '1px solid rgba(74,124,63,0.15)', transition: 'height 0.2s ease' }}
+          />
         )}
+
         <input type="file" accept="image/*" onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
           style={{ width: '100%', fontSize: '0.85rem', color: '#2C2C2C' }} />
-        {coverFile && <p style={{ fontSize: '0.75rem', color: '#4A7C3F', marginTop: '0.3rem' }}>{coverFile.name}</p>}
+        {coverFile && <p style={{ fontSize: '0.75rem', color: '#4A7C3F', margin: 0 }}>{coverFile.name}</p>}
       </div>
 
       <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.875rem', color: '#2C2C2C', cursor: 'pointer' }}>

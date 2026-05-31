@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json()
-    const { title, slug, description, price, published, cover_image_url } = body
+    const { title, slug, description, price, published, cover_image_url, cover_aspect_ratio } = body
 
     if (!title || !slug || price === undefined || price === null) {
       return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 })
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
     const result = await supabaseAdmin
       .from('courses')
-      .insert([{ title, slug, description, price, published, cover_image_url: cover_image_url || null }])
+      .insert([{ title, slug, description, price, published, cover_image_url: cover_image_url || null, cover_aspect_ratio: cover_aspect_ratio || '9:16' }])
       .select()
       .single()
 

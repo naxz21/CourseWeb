@@ -77,7 +77,7 @@ export default async function LessonPage({
 
   const { data: allLessons } = await supabaseAdmin
     .from('lessons')
-    .select('id, module_id, title, position')
+    .select('id, module_id, title, position, cover_image_url')
     .in('module_id', moduleIds.length > 0 ? moduleIds : ['00000000-0000-0000-0000-000000000000'])
     .order('position', { ascending: true })
 
@@ -284,31 +284,116 @@ export default async function LessonPage({
           </section>
         )}
 
+
+
+        {/* ── Índice de Contenido — acordeón por módulo ── */}
+        {modules && modules.length > 0 && (
+          <section style={{ borderRadius: '1.25rem', overflow: 'hidden', border: '1px solid rgba(74,124,63,0.15)' }}>
+            <style>{`
+              .accordion-summary {
+                list-style: none;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.9rem 1.25rem;
+                cursor: pointer;
+                user-select: none;
+                background: rgba(255,255,255,0.55);
+                border-bottom: 1px solid rgba(74,124,63,0.1);
+                font-family: Georgia, serif;
+                transition: background 0.15s;
+              }
+              .accordion-summary:hover { background: rgba(74,124,63,0.06); }
+              .accordion-summary::-webkit-details-marker { display: none; }
+              details[open] .accordion-summary { background: rgba(74,124,63,0.07); }
+              .accordion-chevron { transition: transform 0.2s; font-style: normal; font-size: 0.7rem; color: #4A7C3F; }
+              details[open] .accordion-chevron { transform: rotate(180deg); }
+              .index-lesson-row { transition: background 0.12s; }
+              .index-lesson-row:hover { background: rgba(74,124,63,0.07) !important; }
+            `}</style>
+
+            {/* Cabecera del índice */}
+            <div style={{ padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.4)', borderBottom: '1px solid rgba(74,124,63,0.12)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4A7C3F' }}>Contenido del curso</span>
+              <span style={{ fontSize: '0.7rem', color: '#5C5C4A', marginLeft: 'auto' }}>{completedLessons}/{totalLessons} completadas</span>
+            </div>
+
+            {/* Un <details> por módulo */}
+            {modules.map((module, moduleIndex) => {
+              const moduleLessons = orderedLessons.filter((l) => l.module_id === module.id)
+              const hasCurrentLesson = moduleLessons.some((l) => l.id === lessonId)
+              const moduleCompleted = moduleLessons.filter((l) => progressMap.get(l.id)?.completed).length
+
+              return (
+                <details key={module.id} open={hasCurrentLesson || moduleIndex === 0}>
+                  <summary className="accordion-summary">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: '0.65rem', color: '#8B6914', letterSpacing: '0.1em', textTransform: 'uppercase', flexShrink: 0 }}>
+                        {moduleIndex + 1}
+                      </span>
+                      <span style={{ fontSize: '0.875rem', color: '#2D5A27', fontWeight: hasCurrentLesson ? '600' : '400', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {module.title}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+                      <span style={{ fontSize: '0.7rem', color: '#5C5C4A' }}>{moduleCompleted}/{moduleLessons.length}</span>
+                      <em className="accordion-chevron">▾</em>
+                    </div>
+                  </summary>
+
+                  {/* Lecciones del módulo */}
+                  <div style={{ background: 'rgba(245,242,232,0.4)' }}>
+                    {moduleLessons.map((l, lessonIdx) => {
+                      const lCompleted = !!progressMap.get(l.id)?.completed
+                      const isCurrent = l.id === lessonId
+                      return (
+                        <Link
+                          key={l.id}
+                          href={`/curso/${slug}/leccion/${l.id}`}
+                          className="index-lesson-row"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '0.6rem 1.25rem 0.6rem 2.25rem',
+                            borderBottom: lessonIdx < moduleLessons.length - 1 ? '1px solid rgba(74,124,63,0.07)' : 'none',
+                            background: isCurrent ? 'rgba(74,124,63,0.1)' : 'transparent',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          {/* Indicador de estado */}
+                          <span style={{ fontSize: '0.7rem', flexShrink: 0, color: lCompleted ? '#4A7C3F' : isCurrent ? '#4A7C3F' : 'rgba(74,124,63,0.3)', lineHeight: 1 }}>
+                            {lCompleted ? '✓' : isCurrent ? '▶' : '○'}
+                          </span>
+
+                          {/* Título */}
+                          <span style={{ flex: 1, fontSize: '0.825rem', color: isCurrent ? '#2D5A27' : lCompleted ? '#4A7C3F' : '#5C5C4A', fontWeight: isCurrent ? '600' : '400', lineHeight: '1.3' }}>
+                            {l.title}
+                          </span>
+
+                          {/* Badge "Actual" solo para la lección activa */}
+                          {isCurrent && (
+                            <span style={{ fontSize: '0.6rem', padding: '0.1rem 0.45rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', flexShrink: 0 }}>
+                              Actual
+                            </span>
+                          )}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </details>
+              )
+            })}
+          </section>
+        )}
+
+        {/* Botón marcar como completada — al final de todo */}
         <LessonProgressControls
           courseId={course.id}
           moduleId={lesson.module_id}
           lessonId={lesson.id}
           initialCompleted={isCompleted}
         />
-
-        <div className="nav-buttons">
-           <div style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(74,124,63,0.15)', borderRadius: '1rem', padding: '1.25rem' }}>
-             <p style={{ fontSize: '0.75rem', color: '#8B6914', marginBottom: '0.5rem' }}>Anterior</p>
-             {previousLesson ? (
-               <Link href={`/curso/${slug}/leccion/${previousLesson.id}`} style={{ display: 'inline-block', padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', fontSize: '0.85rem', textDecoration: 'none' }}>
-                 ← {previousLesson.title}
-               </Link>
-             ) : <p style={{ fontSize: '0.875rem', color: '#5C5C4A', fontStyle: 'italic' }}>Primera lección</p>}
-           </div>
-           <div style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(74,124,63,0.15)', borderRadius: '1rem', padding: '1.25rem' }}>
-             <p style={{ fontSize: '0.75rem', color: '#8B6914', marginBottom: '0.5rem' }}>Siguiente</p>
-             {nextLesson ? (
-               <Link href={`/curso/${slug}/leccion/${nextLesson.id}`} style={{ display: 'inline-block', padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#4A7C3F', color: '#F5F2E8', fontSize: '0.85rem', textDecoration: 'none' }}>
-                 {nextLesson.title} →
-               </Link>
-             ) : <p style={{ fontSize: '0.875rem', color: '#5C5C4A', fontStyle: 'italic' }}>Última lección</p>}
-           </div>
-         </div>
 
       </div>
     </main>
